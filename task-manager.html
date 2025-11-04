@@ -29,7 +29,7 @@
             min-height: 100vh;
             height: calc(100vh - 200px);
             color: var(--color-text);
-            padding: 100px 20px;
+            padding: 20px;
             overflow-y: auto;
         }
 
@@ -39,22 +39,21 @@
         }
 
         header {
-            text-align: center;
-            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
         h1 {
-            font-size: 36px;
-            margin-bottom: 10px;
+            font-size: 24px;
             color: var(--color-text);
+            margin: 0;
         }
 
         .nav-tabs {
             display: flex;
             gap: 10px;
-            justify-content: center;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
         }
 
         .nav-tabs button {
@@ -132,7 +131,7 @@
         /* Dashboard Styles */
         .dashboard-grid {
             display: grid;
-            grid-template-columns: 480px 480px;
+            grid-template-columns: 480px 240px 240px;
             grid-template-rows: 240px 240px;
             gap: 20px;
             margin-bottom: 30px;
@@ -148,6 +147,10 @@
 
         .stat-card.large {
             grid-row: span 2;
+        }
+
+        .stat-card.top-right {
+            grid-column: 2 / 4;
         }
 
         .stat-card h3 {
@@ -203,6 +206,52 @@
 
         .stat-value.green {
             color: var(--color-green);
+        }
+
+        .upcoming-tasks-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .upcoming-task-bar {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        .upcoming-task-bar.assigned-terry {
+            background: var(--color-purple);
+        }
+
+        .upcoming-task-bar.assigned-caroline {
+            background: var(--color-teal);
+        }
+
+        .upcoming-task-bar.assigned-both {
+            background: linear-gradient(135deg, var(--color-purple) 0%, var(--color-teal) 100%);
+        }
+
+        .upcoming-task-bar.assigned-unassigned {
+            background: var(--color-grey);
+            color: var(--color-text);
+        }
+
+        .upcoming-task-date {
+            margin-right: 10px;
+            font-weight: 700;
+        }
+
+        .upcoming-task-name {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* Task Card Styles */
@@ -679,14 +728,13 @@
 <body>
     <div class="container">
         <header>
+            <nav class="nav-tabs">
+                <button class="active" data-view="dashboard">Dashboard</button>
+                <button data-view="list">List View</button>
+                <button data-view="timeline">Timeline View</button>
+            </nav>
             <h1>ClearView Task Manager</h1>
         </header>
-
-        <nav class="nav-tabs">
-            <button class="active" data-view="dashboard">Dashboard</button>
-            <button data-view="list">List View</button>
-            <button data-view="timeline">Timeline View</button>
-        </nav>
 
         <!-- Dashboard View -->
         <div id="dashboard-view" class="view-container active">
@@ -697,8 +745,8 @@
                         <canvas id="overall-chart"></canvas>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <h3>Task Overview</h3>
+                <div class="stat-card top-right">
+                    <h3>Days Overview</h3>
                     <div class="chart-container small">
                         <canvas id="overview-chart"></canvas>
                     </div>
@@ -711,13 +759,18 @@
                             <span class="stat-value" id="stat-total">0</span>
                         </div>
                         <div class="stat-row">
-                            <span class="stat-label orange">Outstanding Tasks</span>
+                            <span class="stat-label orange">Outstanding</span>
                             <span class="stat-value orange" id="stat-outstanding">0</span>
                         </div>
                         <div class="stat-row">
-                            <span class="stat-label green">Completed Tasks</span>
+                            <span class="stat-label green">Completed</span>
                             <span class="stat-value green" id="stat-completed">0</span>
                         </div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <h3>Next 4 Due</h3>
+                    <div class="upcoming-tasks-bars" id="upcoming-tasks-bars">
                     </div>
                 </div>
             </div>
@@ -1172,53 +1225,24 @@
             document.getElementById('stat-outstanding').textContent = outstanding;
             document.getElementById('stat-completed').textContent = completed;
 
-            // Overall Status Chart (3D Pie)
+            // Overall Status Chart (Completed vs Outstanding Donut)
             const overallCtx = document.getElementById('overall-chart');
             if (overallChart) {
                 overallChart.destroy();
             }
 
-            const overallData = [];
-            const overallLabels = [];
-            const overallColors = [];
-
-            if (completed > 0) {
-                overallLabels.push('Completed');
-                overallData.push(completed);
-                overallColors.push('#5DFDA8');
-            }
-            if (outstandingTerry > 0) {
-                overallLabels.push('Terry');
-                overallData.push(outstandingTerry);
-                overallColors.push('#9E9EDE');
-            }
-            if (outstandingCaroline > 0) {
-                overallLabels.push('Caroline');
-                overallData.push(outstandingCaroline);
-                overallColors.push('#1AD1DB');
-            }
-            if (outstandingBoth > 0) {
-                overallLabels.push('Both');
-                overallData.push(outstandingBoth);
-                overallColors.push('#7dbfca');
-            }
-            if (outstandingUnassigned > 0) {
-                overallLabels.push('Unassigned');
-                overallData.push(outstandingUnassigned);
-                overallColors.push('#C25B70');
-            }
-
             overallChart = new Chart(overallCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: overallLabels,
+                    labels: ['Outstanding', 'Completed'],
                     datasets: [{
-                        data: overallData,
-                        backgroundColor: overallColors,
+                        data: [outstanding, completed],
+                        backgroundColor: ['#C25B70', '#5DFDA8'],
                         borderWidth: 6,
                         borderColor: '#ffffff',
                         hoverOffset: 20,
-                        offset: 5
+                        offset: 5,
+                        borderRadius: 8
                     }]
                 },
                 options: {
@@ -1293,6 +1317,7 @@
                     scales: {
                         x: {
                             beginAtZero: true,
+                            max: totalOutstandingDays + 2,
                             ticks: {
                                 stepSize: 1
                             }
@@ -1307,6 +1332,33 @@
                     }
                 }
             });
+
+            // Render next 4 due tasks bars
+            const next4Tasks = tasks
+                .filter(t => t.status !== 'Completed')
+                .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+                .slice(0, 4);
+
+            const upcomingBarsContainer = document.getElementById('upcoming-tasks-bars');
+
+            if (next4Tasks.length === 0) {
+                upcomingBarsContainer.innerHTML = '<div style="text-align: center; opacity: 0.6; padding: 20px;">No upcoming tasks</div>';
+            } else {
+                upcomingBarsContainer.innerHTML = next4Tasks.map(task => {
+                    const assignedClass = `assigned-${task.assignedTo.toLowerCase()}`;
+                    const dueDate = new Date(task.dueDate).toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'short'
+                    });
+
+                    return `
+                        <div class="upcoming-task-bar ${assignedClass}">
+                            <span class="upcoming-task-date">${dueDate}</span>
+                            <span class="upcoming-task-name">${task.name}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
 
             // Render upcoming tasks
             const upcomingTasks = tasks
