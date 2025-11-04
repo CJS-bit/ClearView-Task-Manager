@@ -78,7 +78,7 @@
 
         .nav-tabs button.active {
             background: var(--color-dark-grey);
-            color: white;
+            color: black;
             border-color: var(--color-dark-grey);
         }
 
@@ -104,7 +104,7 @@
 
         .btn-primary {
             background: var(--color-dark-grey);
-            color: white;
+            color: black;
         }
 
         .btn-primary:hover {
@@ -120,7 +120,7 @@
 
         .btn-secondary:hover {
             background: var(--color-dark-grey);
-            color: white;
+            color: black;
         }
 
         .btn-small {
@@ -221,7 +221,7 @@
             border-radius: 8px;
             font-size: 11px;
             font-weight: 600;
-            color: white;
+            color: black;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
         }
 
@@ -303,7 +303,7 @@
         .task-title {
             font-size: 15px;
             font-weight: 600;
-            color: white;
+            color: black;
         }
 
         .task-meta {
@@ -319,7 +319,7 @@
             background: rgba(255, 255, 255, 0.25);
             font-size: 12px;
             white-space: nowrap;
-            color: white;
+            color: black;
         }
 
         .due-date-badge {
@@ -585,7 +585,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
             transition: all 0.2s;
             border: 2px solid;
-            color: white;
+            color: black;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
@@ -599,19 +599,16 @@
         .timeline-bar.assigned-terry {
             background: var(--color-purple);
             border-color: #7d7dc8;
-            color: white;
         }
 
         .timeline-bar.assigned-caroline {
             background: var(--color-teal);
             border-color: #14a8b0;
-            color: white;
         }
 
         .timeline-bar.assigned-both {
             background: linear-gradient(135deg, var(--color-purple) 0%, var(--color-teal) 100%);
             border-color: #7d7dc8;
-            color: white;
         }
 
         .timeline-bar.assigned-unassigned {
@@ -1428,13 +1425,17 @@
                 .filter(t => t.status !== 'Completed' && t.assignedTo === 'Caroline')
                 .reduce((sum, t) => sum + (t.duration || 1), 0);
 
+            const bothDays = tasks
+                .filter(t => t.status !== 'Completed' && t.assignedTo === 'Both')
+                .reduce((sum, t) => sum + (t.duration || 1), 0);
+
             overviewChart = new Chart(overviewCtx, {
                 type: 'bar',
                 data: {
-                    labels: ['Total Outstanding', 'Unassigned', 'Terry', 'Caroline'],
+                    labels: ['Total Outstanding', 'Unassigned', 'Terry', 'Caroline', 'Both'],
                     datasets: [{
-                        data: [totalOutstandingDays, unassignedDays, terryDays, carolineDays],
-                        backgroundColor: ['#A0A0A0', '#C25B70', '#9E9EDE', '#1AD1DB'],
+                        data: [totalOutstandingDays, unassignedDays, terryDays, carolineDays, bothDays],
+                        backgroundColor: ['#A0A0A0', '#C25B70', '#9E9EDE', '#1AD1DB', '#7dbfca'],
                         borderRadius: 6,
                         borderSkipped: false
                     }]
