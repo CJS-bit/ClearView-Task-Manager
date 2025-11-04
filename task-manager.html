@@ -700,13 +700,31 @@
             margin-bottom: 8px;
         }
 
+        .category-item.subcategory {
+            margin-left: 20px;
+            background: rgba(232, 232, 232, 0.5);
+        }
+
         .category-add-form {
             display: flex;
             gap: 10px;
+            margin-bottom: 10px;
         }
 
         .category-add-form input {
             flex: 1;
+        }
+
+        .category-select-parent {
+            margin-bottom: 15px;
+        }
+
+        .category-select-parent select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid var(--color-grey);
+            border-radius: 8px;
+            background: white;
         }
 
         /* Responsive */
@@ -929,9 +947,15 @@
         <div class="form-modal">
             <h2>Manage Categories</h2>
             <div class="category-list" id="category-list"></div>
+            <div class="category-select-parent">
+                <label for="parent-category-select">Parent Category (leave blank for main category):</label>
+                <select id="parent-category-select">
+                    <option value="">-- Main Category --</option>
+                </select>
+            </div>
             <div class="category-add-form">
                 <input type="text" id="new-category-name" placeholder="New category name...">
-                <button class="btn btn-primary btn-small" onclick="addCategory()">Add</button>
+                <button class="btn btn-primary btn-small" onclick="addCategory()">Add Category</button>
             </div>
             <div class="form-actions">
                 <button class="btn btn-secondary" onclick="closeCategoriesModal()">Close</button>
@@ -942,7 +966,12 @@
     <script>
         // Data Store
         let tasks = [];
-        let categories = ['Research', 'Development', 'Pitch', 'Retention Calculator'];
+        let categories = [
+            { id: '1', name: 'Research', parentId: null },
+            { id: '2', name: 'Development', parentId: null },
+            { id: '3', name: 'Pitch', parentId: null },
+            { id: '4', name: 'Retention Calculator', parentId: null }
+        ];
         let currentView = 'dashboard';
         let editingTaskId = null;
         let overallChart = null;
@@ -983,13 +1012,61 @@
             }
 
             if (savedCategories) {
-                categories = JSON.parse(savedCategories);
+                const loadedCategories = JSON.parse(savedCategories);
+                // Migrate old string-based categories to new object format
+                if (loadedCategories.length > 0 && typeof loadedCategories[0] === 'string') {
+                    categories = loadedCategories.map((cat, idx) => ({
+                        id: String(idx + 1),
+                        name: cat,
+                        parentId: null
+                    }));
+                    saveData(); // Save migrated data
+                } else {
+                    categories = loadedCategories;
+                }
             }
         }
 
         function saveData() {
             localStorage.setItem('clearview_tasks', JSON.stringify(tasks));
             localStorage.setItem('clearview_categories', JSON.stringify(categories));
+        }
+
+        // Category Helper Functions
+        function getCategoryById(id) {
+            return categories.find(c => c.id === id);
+        }
+
+        function getCategoryFullPath(categoryId) {
+            const category = getCategoryById(categoryId);
+            if (!category) return '';
+
+            if (category.parentId) {
+                const parent = getCategoryById(category.parentId);
+                return parent ? `${parent.name} > ${category.name}` : category.name;
+            }
+            return category.name;
+        }
+
+        function getMainCategories() {
+            return categories.filter(c => !c.parentId);
+        }
+
+        function getSubcategories(parentId) {
+            return categories.filter(c => c.parentId === parentId);
+        }
+
+        function getAllCategoriesFlat() {
+            const result = [];
+            const mainCats = getMainCategories();
+
+            mainCats.forEach(mainCat => {
+                result.push(mainCat);
+                const subs = getSubcategories(mainCat.id);
+                subs.forEach(sub => result.push(sub));
+            });
+
+            return result;
         }
 
         // Task Management
@@ -999,11 +1076,14 @@
             const form = document.getElementById('task-form');
             const title = document.getElementById('form-title');
 
-            // Populate categories
+            // Populate categories hierarchically
             const categorySelect = document.getElementById('task-category');
             categorySelect.innerHTML = '<option value="">Select category...</option>';
-            categories.forEach(cat => {
-                categorySelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+
+            const allCats = getAllCategoriesFlat();
+            allCats.forEach(cat => {
+                const displayName = cat.parentId ? `  → ${cat.name}` : cat.name;
+                categorySelect.innerHTML += `<option value="${cat.id}">${displayName}</option>`;
             });
 
             // Populate dependencies
@@ -1059,7 +1139,8 @@
             depSelect.innerHTML = '';
 
             tasks.filter(t => t.id !== editingTaskId).forEach(task => {
-                depSelect.innerHTML += `<option value="${task.id}">${task.name} (${task.category})</option>`;
+                const categoryPath = getCategoryFullPath(task.category);
+                depSelect.innerHTML += `<option value="${task.id}">${task.name} (${categoryPath})</option>`;
             });
         }
 
@@ -1123,44 +1204,104 @@
         function openCategoriesModal() {
             document.getElementById('categories-modal').classList.add('active');
             renderCategories();
+            populateParentCategorySelect();
         }
 
         function closeCategoriesModal() {
             document.getElementById('categories-modal').classList.remove('active');
         }
 
+        function populateParentCategorySelect() {
+            const select = document.getElementById('parent-category-select');
+            select.innerHTML = '<option value="">-- Main Category --</option>';
+
+            const mainCats = getMainCategories();
+            mainCats.forEach(cat => {
+                select.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
+            });
+        }
+
         function renderCategories() {
             const list = document.getElementById('category-list');
             list.innerHTML = '';
 
-            categories.forEach(cat => {
+            const mainCats = getMainCategories();
+
+            mainCats.forEach(mainCat => {
                 list.innerHTML += `
                     <div class="category-item">
-                        <span>${cat}</span>
-                        <button class="btn btn-secondary btn-small" onclick="deleteCategory('${cat}')">Delete</button>
+                        <span><strong>${mainCat.name}</strong></span>
+                        <button class="btn btn-secondary btn-small" onclick="deleteCategory('${mainCat.id}')">Delete</button>
                     </div>
                 `;
+
+                const subs = getSubcategories(mainCat.id);
+                subs.forEach(sub => {
+                    list.innerHTML += `
+                        <div class="category-item subcategory">
+                            <span>→ ${sub.name}</span>
+                            <button class="btn btn-secondary btn-small" onclick="deleteCategory('${sub.id}')">Delete</button>
+                        </div>
+                    `;
+                });
             });
         }
 
         function addCategory() {
             const input = document.getElementById('new-category-name');
             const name = input.value.trim();
+            const parentId = document.getElementById('parent-category-select').value || null;
 
-            if (name && !categories.includes(name)) {
-                categories.push(name);
-                saveData();
-                renderCategories();
-                input.value = '';
+            if (!name) return;
+
+            // Check for duplicate names within same parent
+            const siblings = parentId ? getSubcategories(parentId) : getMainCategories();
+            if (siblings.some(cat => cat.name.toLowerCase() === name.toLowerCase())) {
+                alert('A category with this name already exists at this level.');
+                return;
             }
+
+            const newCategory = {
+                id: Date.now().toString(),
+                name: name,
+                parentId: parentId
+            };
+
+            categories.push(newCategory);
+            saveData();
+            renderCategories();
+            populateParentCategorySelect();
+            input.value = '';
         }
 
-        function deleteCategory(catName) {
-            if (confirm(`Delete category "${catName}"? Tasks in this category will need to be reassigned.`)) {
-                categories = categories.filter(c => c !== catName);
-                saveData();
-                renderCategories();
+        function deleteCategory(catId) {
+            const category = getCategoryById(catId);
+            if (!category) return;
+
+            // Check if it has subcategories
+            const subs = getSubcategories(catId);
+            if (subs.length > 0) {
+                if (!confirm(`"${category.name}" has subcategories. Deleting it will also delete all subcategories. Continue?`)) {
+                    return;
+                }
+                // Delete all subcategories
+                subs.forEach(sub => {
+                    categories = categories.filter(c => c.id !== sub.id);
+                });
             }
+
+            // Check if any tasks use this category
+            const tasksUsingCat = tasks.filter(t => t.category === catId);
+            if (tasksUsingCat.length > 0) {
+                if (!confirm(`${tasksUsingCat.length} task(s) use this category. They will need to be reassigned. Continue?`)) {
+                    return;
+                }
+            }
+
+            categories = categories.filter(c => c.id !== catId);
+            saveData();
+            renderCategories();
+            populateParentCategorySelect();
         }
 
         // Status Calculation
@@ -1404,7 +1545,9 @@
                     case 'name':
                         return a.name.localeCompare(b.name);
                     case 'category':
-                        return a.category.localeCompare(b.category);
+                        const aCatPath = getCategoryFullPath(a.category);
+                        const bCatPath = getCategoryFullPath(b.category);
+                        return aCatPath.localeCompare(bCatPath);
                     case 'assignedTo':
                         return a.assignedTo.localeCompare(b.assignedTo);
                     case 'status':
@@ -1437,8 +1580,11 @@
             // Populate filter dropdowns
             const categoryFilter = document.getElementById('filter-category');
             categoryFilter.innerHTML = '<option value="all">All</option>';
-            categories.forEach(cat => {
-                categoryFilter.innerHTML += `<option value="${cat}">${cat}</option>`;
+
+            const allCats = getAllCategoriesFlat();
+            allCats.forEach(cat => {
+                const displayName = getCategoryFullPath(cat.id);
+                categoryFilter.innerHTML += `<option value="${cat.id}">${displayName}</option>`;
             });
 
             // Apply filters and sort
@@ -1455,10 +1601,12 @@
                 month: 'short'
             });
 
+            const categoryPath = getCategoryFullPath(task.category);
+
             return `
                 <div class="task-card ${assignedClass} ${completedClass}" onclick="openTaskForm('${task.id}')">
                     <div class="task-card-left">
-                        <span class="task-badge">${task.category}</span>
+                        <span class="task-badge">${categoryPath}</span>
                         <div class="task-title">${task.name}</div>
                         <span class="due-date-badge ${status}">${dueDate}</span>
                     </div>
