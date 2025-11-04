@@ -15,12 +15,14 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            height: calc(100vh - 200px);
             color: #ffffff;
-            padding: 20px;
+            padding: 100px 20px;
+            overflow-y: auto;
         }
 
         .container {
-            max-width: 1600px;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
@@ -152,14 +154,17 @@
 
         /* Task Card Styles */
         .task-card {
-            padding: 16px 20px;
+            padding: 10px 15px;
             border-radius: 10px;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             backdrop-filter: blur(10px);
             border: 2px solid;
             transition: all 0.2s;
             cursor: pointer;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .task-card:hover {
@@ -167,52 +172,77 @@
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
         }
 
-        .task-card.status-on-track {
-            background: rgba(134, 239, 172, 0.25);
-            border-color: rgba(134, 239, 172, 0.5);
+        .task-card.assigned-terry {
+            background: rgba(200, 180, 230, 0.35);
+            border-color: rgba(200, 180, 230, 0.6);
         }
 
-        .task-card.status-due-soon {
-            background: rgba(255, 183, 107, 0.25);
-            border-color: rgba(255, 183, 107, 0.5);
+        .task-card.assigned-caroline {
+            background: rgba(180, 230, 220, 0.35);
+            border-color: rgba(180, 230, 220, 0.6);
         }
 
-        .task-card.status-overdue {
-            background: rgba(248, 113, 113, 0.25);
-            border-color: rgba(248, 113, 113, 0.5);
+        .task-card.assigned-both {
+            background: linear-gradient(135deg, rgba(200, 180, 230, 0.35), rgba(180, 230, 220, 0.35));
+            border-color: rgba(190, 205, 225, 0.6);
         }
 
         .task-card.status-completed {
-            background: rgba(134, 239, 172, 0.35);
-            border-color: rgba(134, 239, 172, 0.6);
-            opacity: 0.8;
+            opacity: 0.7;
         }
 
-        .task-card-header {
+        .task-card-left {
             display: flex;
-            justify-content: space-between;
+            gap: 12px;
             align-items: center;
-            margin-bottom: 8px;
+            flex: 1;
         }
 
         .task-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
         }
 
         .task-meta {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             font-size: 13px;
-            opacity: 0.9;
-            flex-wrap: wrap;
+            align-items: center;
         }
 
         .task-badge {
-            padding: 4px 10px;
-            border-radius: 6px;
+            padding: 3px 8px;
+            border-radius: 5px;
             background: rgba(255, 255, 255, 0.2);
             font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .due-date-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .due-date-badge.on-track {
+            background: rgba(134, 239, 172, 0.6);
+            color: #065f46;
+        }
+
+        .due-date-badge.due-soon {
+            background: rgba(255, 183, 107, 0.6);
+            color: #92400e;
+        }
+
+        .due-date-badge.overdue {
+            background: rgba(248, 113, 113, 0.6);
+            color: #7f1d1d;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 5px;
         }
 
         /* Form Styles */
@@ -405,6 +435,7 @@
             font-weight: 600;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
             transition: all 0.2s;
+            border: 2px solid;
         }
 
         .timeline-bar:hover {
@@ -412,28 +443,50 @@
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
         }
 
-        .timeline-bar.on-track {
-            background: rgba(134, 239, 172, 0.6);
-            border: 2px solid rgba(134, 239, 172, 0.8);
+        .timeline-bar.assigned-terry {
+            background: rgba(200, 180, 230, 0.5);
+            border-color: rgba(200, 180, 230, 0.8);
         }
 
-        .timeline-bar.due-soon {
-            background: rgba(255, 183, 107, 0.6);
-            border: 2px solid rgba(255, 183, 107, 0.8);
+        .timeline-bar.assigned-caroline {
+            background: rgba(180, 230, 220, 0.5);
+            border-color: rgba(180, 230, 220, 0.8);
         }
 
-        .timeline-bar.overdue {
-            background: rgba(248, 113, 113, 0.6);
-            border: 2px solid rgba(248, 113, 113, 0.8);
+        .timeline-bar.assigned-both {
+            background: linear-gradient(135deg, rgba(200, 180, 230, 0.5), rgba(180, 230, 220, 0.5));
+            border-color: rgba(190, 205, 225, 0.8);
         }
 
-        .timeline-bar.completed {
-            background: rgba(134, 239, 172, 0.8);
-            border: 2px solid rgba(134, 239, 172, 1);
+        .timeline-bar.status-completed {
+            opacity: 0.7;
         }
 
         .timeline-bar.blocked {
             border: 3px solid rgba(248, 113, 113, 1);
+        }
+
+        .timeline-due-indicator {
+            position: absolute;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .timeline-due-indicator.on-track {
+            background: rgba(134, 239, 172, 1);
+        }
+
+        .timeline-due-indicator.due-soon {
+            background: rgba(255, 183, 107, 1);
+        }
+
+        .timeline-due-indicator.overdue {
+            background: rgba(248, 113, 113, 1);
         }
 
         /* Dependency Lines */
@@ -631,7 +684,13 @@
                         <option value="">Select person...</option>
                         <option value="Terry">Terry</option>
                         <option value="Caroline">Caroline</option>
+                        <option value="Both">Both</option>
                     </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="task-duration">Duration (days) *</label>
+                    <input type="number" id="task-duration" required min="1" value="1" placeholder="Number of days">
                 </div>
 
                 <div class="form-group">
@@ -759,6 +818,7 @@
                     document.getElementById('task-description').value = task.description || '';
                     document.getElementById('task-category').value = task.category;
                     document.getElementById('task-assigned').value = task.assignedTo;
+                    document.getElementById('task-duration').value = task.duration || 1;
                     document.getElementById('task-due-date').value = task.dueDate;
                     document.getElementById('task-status').value = task.status;
 
@@ -776,6 +836,7 @@
             } else {
                 title.textContent = 'Add New Task';
                 form.reset();
+                document.getElementById('task-duration').value = 1;
                 document.getElementById('dependencies-group').style.display = 'none';
             }
 
@@ -812,6 +873,7 @@
                 description: document.getElementById('task-description').value,
                 category: document.getElementById('task-category').value,
                 assignedTo: document.getElementById('task-assigned').value,
+                duration: parseInt(document.getElementById('task-duration').value) || 1,
                 dueDate: document.getElementById('task-due-date').value,
                 status: document.getElementById('task-status').value,
                 dependencies: [],
@@ -1002,51 +1064,29 @@
 
         function renderTaskCard(task, showFullDetails = false) {
             const status = getTaskStatus(task);
-            const blocked = isTaskBlocked(task);
-            const statusClass = `status-${status}`;
+            const assignedClass = `assigned-${task.assignedTo.toLowerCase()}`;
+            const completedClass = task.status === 'Completed' ? 'status-completed' : '';
 
             const dueDate = new Date(task.dueDate).toLocaleDateString('en-GB', {
                 day: 'numeric',
-                month: 'short',
-                year: 'numeric'
+                month: 'short'
             });
 
-            let dependencyInfo = '';
-            if (task.dependencies && task.dependencies.length > 0) {
-                const depNames = task.dependencies.map(depId => {
-                    const depTask = tasks.find(t => t.id === depId);
-                    return depTask ? depTask.name : 'Unknown';
-                });
-                dependencyInfo = `<div style="margin-top: 8px; font-size: 13px; opacity: 0.9;">
-                    ${blocked ? '🔴' : '✅'} Depends on: ${depNames.join(', ')}
-                </div>`;
-            }
-
             return `
-                <div class="task-card ${statusClass}" onclick="openTaskForm('${task.id}')">
-                    <div class="task-card-header">
-                        <div class="task-title">
-                            <span class="status-indicator ${status}"></span>
-                            ${task.name}
-                        </div>
-                        <div>
-                            <button class="btn btn-secondary btn-small" onclick="event.stopPropagation(); toggleTaskComplete('${task.id}')"
-                                style="margin-right: 5px;">
-                                ${task.status === 'Completed' ? 'Undo' : 'Complete'}
-                            </button>
-                            <button class="btn btn-secondary btn-small" onclick="event.stopPropagation(); deleteTask('${task.id}')">
-                                Delete
-                            </button>
-                        </div>
-                    </div>
-                    <div class="task-meta">
-                        <span><strong>Due:</strong> ${dueDate}</span>
+                <div class="task-card ${assignedClass} ${completedClass}" onclick="openTaskForm('${task.id}')">
+                    <div class="task-card-left">
                         <span class="task-badge">${task.category}</span>
-                        <span class="task-badge">${task.assignedTo}</span>
-                        <span class="task-badge">${task.status}</span>
+                        <div class="task-title">${task.name}</div>
+                        <span class="due-date-badge ${status}">${dueDate}</span>
                     </div>
-                    ${task.description ? `<div style="margin-top: 10px; font-size: 14px; opacity: 0.9;">${task.description}</div>` : ''}
-                    ${dependencyInfo}
+                    <div class="task-actions">
+                        <button class="btn btn-secondary btn-small" onclick="event.stopPropagation(); toggleTaskComplete('${task.id}')">
+                            ${task.status === 'Completed' ? 'Undo' : 'Complete'}
+                        </button>
+                        <button class="btn btn-secondary btn-small" onclick="event.stopPropagation(); deleteTask('${task.id}')">
+                            Delete
+                        </button>
+                    </div>
                 </div>
             `;
         }
@@ -1059,13 +1099,26 @@
                 return;
             }
 
-            // Sort tasks by due date
-            const sortedTasks = [...tasks].sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+            // Sort tasks by start date (due date - duration)
+            const sortedTasks = [...tasks].sort((a, b) => {
+                const aStart = new Date(a.dueDate);
+                aStart.setDate(aStart.getDate() - (a.duration || 1) + 1);
+                const bStart = new Date(b.dueDate);
+                bStart.setDate(bStart.getDate() - (b.duration || 1) + 1);
+                return aStart - bStart;
+            });
 
-            // Calculate date range
-            const dates = sortedTasks.map(t => new Date(t.dueDate));
-            const minDate = new Date(Math.min(...dates));
-            const maxDate = new Date(Math.max(...dates));
+            // Calculate date range including all start and end dates
+            let allDates = [];
+            sortedTasks.forEach(t => {
+                const endDate = new Date(t.dueDate);
+                const startDate = new Date(t.dueDate);
+                startDate.setDate(startDate.getDate() - (t.duration || 1) + 1);
+                allDates.push(startDate, endDate);
+            });
+
+            const minDate = new Date(Math.min(...allDates));
+            const maxDate = new Date(Math.max(...allDates));
 
             // Add padding to date range
             minDate.setDate(minDate.getDate() - 2);
@@ -1098,21 +1151,30 @@
             sortedTasks.forEach(task => {
                 const status = getTaskStatus(task);
                 const blocked = isTaskBlocked(task);
-                const taskDate = new Date(task.dueDate);
+                const assignedClass = `assigned-${task.assignedTo.toLowerCase()}`;
+                const completedClass = task.status === 'Completed' ? 'status-completed' : '';
 
-                // Calculate position
-                const daysFromStart = Math.ceil((taskDate - minDate) / (1000 * 60 * 60 * 24));
+                const taskEndDate = new Date(task.dueDate);
+                const taskStartDate = new Date(task.dueDate);
+                const duration = task.duration || 1;
+                taskStartDate.setDate(taskStartDate.getDate() - duration + 1);
+
+                // Calculate position and width
+                const daysFromStart = Math.ceil((taskStartDate - minDate) / (1000 * 60 * 60 * 24));
                 const leftPercent = (daysFromStart / daysDiff) * 100;
+                const widthPercent = (duration / daysDiff) * 100;
+                const minWidth = 80; // Minimum width in pixels for readability
 
                 html += `
                     <div class="timeline-row">
                         <div class="timeline-task-name">${task.name}</div>
                         <div class="timeline-task-bar-container" data-task-id="${task.id}">
                             <div class="timeline-bars">
-                                <div class="timeline-bar ${status} ${blocked ? 'blocked' : ''}"
-                                     style="left: ${leftPercent}%; width: 100px;"
+                                <div class="timeline-bar ${assignedClass} ${completedClass} ${blocked ? 'blocked' : ''}"
+                                     style="left: ${leftPercent}%; width: max(${widthPercent}%, ${minWidth}px);"
                                      onclick="openTaskForm('${task.id}')">
                                     ${task.name}
+                                    <div class="timeline-due-indicator ${status}"></div>
                                 </div>
                             </div>
                         </div>
