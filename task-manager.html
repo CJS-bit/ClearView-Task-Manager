@@ -1691,11 +1691,11 @@
                 const duration = task.duration || 1;
                 taskStartDate.setDate(taskStartDate.getDate() - duration + 1);
 
-                // Calculate position and width
+                // Calculate position and width - account for total number of date cells
+                const totalDateCells = daysDiff + 1; // dateHeaders has daysDiff + 1 cells (0 to daysDiff inclusive)
                 const daysFromStart = Math.ceil((taskStartDate - minDate) / (1000 * 60 * 60 * 24));
-                const leftPercent = (daysFromStart / daysDiff) * 100;
-                const widthPercent = (duration / daysDiff) * 100;
-                const minWidth = 80;
+                const leftPercent = (daysFromStart / totalDateCells) * 100;
+                const widthPercent = (duration / totalDateCells) * 100;
 
                 html += `
                     <div class="timeline-row">
@@ -1703,7 +1703,7 @@
                         <div class="timeline-task-bar-container" data-task-id="${task.id}">
                             <div class="timeline-bars">
                                 <div class="timeline-bar ${assignedClass} ${completedClass} ${blocked ? 'blocked' : ''}"
-                                     style="left: ${leftPercent}%; width: max(${widthPercent}%, ${minWidth}px);"
+                                     style="left: ${leftPercent}%; width: ${widthPercent}%;"
                                      onclick="openTaskForm('${task.id}')"
                                      title="${task.name}">
                                     ${task.name}
