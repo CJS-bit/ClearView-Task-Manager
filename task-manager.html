@@ -234,7 +234,7 @@
         }
 
         .upcoming-task-bar.assigned-both {
-            background: linear-gradient(135deg, var(--color-purple) 0%, var(--color-teal) 100%);
+            background: var(--color-orange);
         }
 
         .upcoming-task-bar.assigned-unassigned {
@@ -282,7 +282,7 @@
         }
 
         .task-card.assigned-both {
-            background: linear-gradient(135deg, var(--color-purple) 0%, var(--color-teal) 100%);
+            background: var(--color-orange);
         }
 
         .task-card.assigned-unassigned {
@@ -340,6 +340,10 @@
 
         .due-date-badge.overdue {
             background: var(--color-red);
+        }
+
+        .due-date-badge.unallocated {
+            background: var(--color-dark-grey);
         }
 
         .task-actions {
@@ -461,11 +465,98 @@
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+            align-items: center;
             margin-bottom: 20px;
             padding: 15px;
             background: white;
             border-radius: 12px;
             border: 2px solid var(--color-grey);
+        }
+
+        .filter-controls .checkbox-group {
+            margin-bottom: 0;
+        }
+
+        /* Accordion Styles */
+        .accordion-main {
+            margin-bottom: 12px;
+        }
+
+        .accordion-main-header {
+            padding: 15px 20px;
+            background: var(--color-dark-grey);
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            border: 2px solid var(--color-dark-grey);
+        }
+
+        .accordion-main-header:hover {
+            background: #333333;
+        }
+
+        .accordion-main-header .arrow {
+            transition: transform 0.3s;
+            font-size: 14px;
+        }
+
+        .accordion-main-header.active .arrow {
+            transform: rotate(90deg);
+        }
+
+        .accordion-main-content {
+            display: none;
+            padding: 10px 0 0 20px;
+        }
+
+        .accordion-main-content.active {
+            display: block;
+        }
+
+        .accordion-sub {
+            margin-bottom: 8px;
+        }
+
+        .accordion-sub-header {
+            padding: 12px 18px;
+            background: var(--color-grey);
+            color: var(--color-text);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .accordion-sub-header:hover {
+            background: #d8d8d8;
+        }
+
+        .accordion-sub-header .arrow {
+            transition: transform 0.3s;
+            font-size: 12px;
+        }
+
+        .accordion-sub-header.active .arrow {
+            transform: rotate(90deg);
+        }
+
+        .accordion-sub-content {
+            display: none;
+            padding: 8px 0 0 0;
+        }
+
+        .accordion-sub-content.active {
+            display: block;
         }
 
         .filter-controls select {
@@ -607,8 +698,8 @@
         }
 
         .timeline-bar.assigned-both {
-            background: linear-gradient(135deg, var(--color-purple) 0%, var(--color-teal) 100%);
-            border-color: #7d7dc8;
+            background: var(--color-orange);
+            border-color: #c4945c;
         }
 
         .timeline-bar.assigned-unassigned {
@@ -645,6 +736,10 @@
 
         .timeline-due-indicator.overdue {
             background: var(--color-red);
+        }
+
+        .timeline-due-indicator.unallocated {
+            background: var(--color-dark-grey);
         }
 
         /* Dependency Lines */
@@ -812,40 +907,13 @@
             </div>
 
             <div class="filter-controls">
-                <div>
-                    <label>Filter by Person:</label>
-                    <select id="filter-person" onchange="applyFiltersAndSort()">
-                        <option value="all">All</option>
-                        <option value="Terry">Terry</option>
-                        <option value="Caroline">Caroline</option>
-                        <option value="Both">Both</option>
-                        <option value="Unassigned">Unassigned</option>
-                    </select>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="show-all" onchange="renderListView()" checked>
+                    <label for="show-all">Show All</label>
                 </div>
-                <div>
-                    <label>Filter by Category:</label>
-                    <select id="filter-category" onchange="applyFiltersAndSort()">
-                        <option value="all">All</option>
-                    </select>
-                </div>
-                <div>
-                    <label>Filter by Status:</label>
-                    <select id="filter-status" onchange="applyFiltersAndSort()">
-                        <option value="all">All</option>
-                        <option value="Not Started">Not Started</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Completed">Completed</option>
-                    </select>
-                </div>
-                <div>
-                    <label>Sort by:</label>
-                    <select id="sort-by" onchange="applyFiltersAndSort()">
-                        <option value="dueDate">Due Date</option>
-                        <option value="name">Task Name</option>
-                        <option value="category">Category</option>
-                        <option value="assignedTo">Person</option>
-                        <option value="status">Status</option>
-                    </select>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="show-outstanding" onchange="renderListView()">
+                    <label for="show-outstanding">Show All Outstanding</label>
                 </div>
             </div>
 
@@ -906,8 +974,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="task-due-date">Due Date *</label>
-                    <input type="date" id="task-due-date" required>
+                    <label for="task-due-date">Due Date (leave blank for unallocated)</label>
+                    <input type="date" id="task-due-date">
                 </div>
 
                 <div class="form-group">
@@ -945,9 +1013,9 @@
             <h2>Manage Categories</h2>
             <div class="category-list" id="category-list"></div>
             <div class="category-select-parent">
-                <label for="parent-category-select">Parent Category (leave blank for main category):</label>
+                <label for="parent-category-select">Select Parent Category (PITCH or APP) *:</label>
                 <select id="parent-category-select">
-                    <option value="">-- Main Category --</option>
+                    <option value="">-- Select Parent --</option>
                 </select>
             </div>
             <div class="category-add-form">
@@ -964,10 +1032,16 @@
         // Data Store
         let tasks = [];
         let categories = [
-            { id: '1', name: 'Research', parentId: null },
-            { id: '2', name: 'Development', parentId: null },
-            { id: '3', name: 'Pitch', parentId: null },
-            { id: '4', name: 'Retention Calculator', parentId: null }
+            { id: 'pitch', name: 'PITCH', parentId: null, isMainCategory: true },
+            { id: 'pitch-app', name: 'App Pitch', parentId: 'pitch', isMainCategory: false },
+            { id: 'pitch-tide', name: 'Tide Pitch', parentId: 'pitch', isMainCategory: false },
+            { id: 'app', name: 'APP', parentId: null, isMainCategory: true },
+            { id: 'app-design-ui', name: 'Design UI', parentId: 'app', isMainCategory: false },
+            { id: 'app-design-coding', name: 'Design Coding', parentId: 'app', isMainCategory: false },
+            { id: 'app-coding', name: 'Coding', parentId: 'app', isMainCategory: false },
+            { id: 'app-copywriting', name: 'Copywriting', parentId: 'app', isMainCategory: false },
+            { id: 'app-bugs', name: 'Bugs/Changes', parentId: 'app', isMainCategory: false },
+            { id: 'app-security', name: 'Security/GDPR/Protocols', parentId: 'app', isMainCategory: false }
         ];
         let currentView = 'dashboard';
         let editingTaskId = null;
@@ -1073,14 +1147,19 @@
             const form = document.getElementById('task-form');
             const title = document.getElementById('form-title');
 
-            // Populate categories hierarchically
+            // Populate categories hierarchically - only show subcategories (not main categories)
             const categorySelect = document.getElementById('task-category');
             categorySelect.innerHTML = '<option value="">Select category...</option>';
 
-            const allCats = getAllCategoriesFlat();
-            allCats.forEach(cat => {
-                const displayName = cat.parentId ? `  → ${cat.name}` : cat.name;
-                categorySelect.innerHTML += `<option value="${cat.id}">${displayName}</option>`;
+            const mainCats = getMainCategories();
+            mainCats.forEach(mainCat => {
+                const subs = getSubcategories(mainCat.id);
+                if (subs.length > 0) {
+                    categorySelect.innerHTML += `<option disabled>─── ${mainCat.name} ───</option>`;
+                    subs.forEach(sub => {
+                        categorySelect.innerHTML += `<option value="${sub.id}">  ${sub.name}</option>`;
+                    });
+                }
             });
 
             // Populate dependencies
@@ -1225,10 +1304,10 @@
             const mainCats = getMainCategories();
 
             mainCats.forEach(mainCat => {
+                // Main categories (PITCH and APP) cannot be deleted
                 list.innerHTML += `
                     <div class="category-item">
                         <span><strong>${mainCat.name}</strong></span>
-                        <button class="btn btn-secondary btn-small" onclick="deleteCategory('${mainCat.id}')">Delete</button>
                     </div>
                 `;
 
@@ -1247,21 +1326,28 @@
         function addCategory() {
             const input = document.getElementById('new-category-name');
             const name = input.value.trim();
-            const parentId = document.getElementById('parent-category-select').value || null;
+            const parentId = document.getElementById('parent-category-select').value;
 
             if (!name) return;
 
+            // Must select a parent category (PITCH or APP)
+            if (!parentId) {
+                alert('Please select a parent category (PITCH or APP).');
+                return;
+            }
+
             // Check for duplicate names within same parent
-            const siblings = parentId ? getSubcategories(parentId) : getMainCategories();
+            const siblings = getSubcategories(parentId);
             if (siblings.some(cat => cat.name.toLowerCase() === name.toLowerCase())) {
-                alert('A category with this name already exists at this level.');
+                alert('A category with this name already exists under this parent.');
                 return;
             }
 
             const newCategory = {
                 id: Date.now().toString(),
                 name: name,
-                parentId: parentId
+                parentId: parentId,
+                isMainCategory: false
             };
 
             categories.push(newCategory);
@@ -1305,6 +1391,11 @@
         function getTaskStatus(task) {
             if (task.status === 'Completed') {
                 return 'completed';
+            }
+
+            // Tasks without a due date are unallocated
+            if (!task.dueDate) {
+                return 'unallocated';
             }
 
             const today = new Date();
@@ -1435,7 +1526,7 @@
                     labels: ['Total Outstanding', 'Unassigned', 'Terry', 'Caroline', 'Both'],
                     datasets: [{
                         data: [totalOutstandingDays, unassignedDays, terryDays, carolineDays, bothDays],
-                        backgroundColor: ['#A0A0A0', '#C25B70', '#9E9EDE', '#1AD1DB', '#7dbfca'],
+                        backgroundColor: ['#A0A0A0', '#C25B70', '#9E9EDE', '#1AD1DB', '#E6B589'],
                         borderRadius: 6,
                         borderSkipped: false
                     }]
@@ -1477,7 +1568,7 @@
 
             // Render next 4 due tasks bars
             const next4Tasks = tasks
-                .filter(t => t.status !== 'Completed')
+                .filter(t => t.status !== 'Completed' && t.dueDate)
                 .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
                 .slice(0, 4);
 
@@ -1502,10 +1593,15 @@
                 }).join('');
             }
 
-            // Render upcoming tasks
+            // Render upcoming tasks - show tasks with due dates first, then unallocated
             const upcomingTasks = tasks
                 .filter(t => t.status !== 'Completed')
-                .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+                .sort((a, b) => {
+                    if (!a.dueDate && !b.dueDate) return 0;
+                    if (!a.dueDate) return 1;
+                    if (!b.dueDate) return -1;
+                    return new Date(a.dueDate) - new Date(b.dueDate);
+                });
 
             const container = document.getElementById('dashboard-tasks');
 
@@ -1517,79 +1613,100 @@
             container.innerHTML = upcomingTasks.map(task => renderTaskCard(task)).join('');
         }
 
-        function applyFiltersAndSort() {
-            const filterPerson = document.getElementById('filter-person').value;
-            const filterCategory = document.getElementById('filter-category').value;
-            const filterStatus = document.getElementById('filter-status').value;
-            const sortBy = document.getElementById('sort-by').value;
-
-            let filteredTasks = [...tasks];
-
-            // Apply filters
-            if (filterPerson !== 'all') {
-                filteredTasks = filteredTasks.filter(t => t.assignedTo === filterPerson);
-            }
-
-            if (filterCategory !== 'all') {
-                filteredTasks = filteredTasks.filter(t => t.category === filterCategory);
-            }
-
-            if (filterStatus !== 'all') {
-                filteredTasks = filteredTasks.filter(t => t.status === filterStatus);
-            }
-
-            // Apply sorting
-            filteredTasks.sort((a, b) => {
-                switch(sortBy) {
-                    case 'dueDate':
-                        return new Date(a.dueDate) - new Date(b.dueDate);
-                    case 'name':
-                        return a.name.localeCompare(b.name);
-                    case 'category':
-                        const aCatPath = getCategoryFullPath(a.category);
-                        const bCatPath = getCategoryFullPath(b.category);
-                        return aCatPath.localeCompare(bCatPath);
-                    case 'assignedTo':
-                        return a.assignedTo.localeCompare(b.assignedTo);
-                    case 'status':
-                        return a.status.localeCompare(b.status);
-                    default:
-                        return 0;
-                }
-            });
-
-            // Also sort completed to bottom if sorting by due date
-            if (sortBy === 'dueDate') {
-                filteredTasks.sort((a, b) => {
-                    if (a.status === 'Completed' && b.status !== 'Completed') return 1;
-                    if (a.status !== 'Completed' && b.status === 'Completed') return -1;
-                    return new Date(a.dueDate) - new Date(b.dueDate);
-                });
-            }
-
+        function renderListView() {
             const container = document.getElementById('list-tasks');
+            const showAll = document.getElementById('show-all').checked;
+            const showOutstanding = document.getElementById('show-outstanding').checked;
+
+            // Determine which tasks to show
+            let filteredTasks = [...tasks];
+            if (showOutstanding && !showAll) {
+                filteredTasks = filteredTasks.filter(t => t.status !== 'Completed');
+            }
 
             if (filteredTasks.length === 0) {
-                container.innerHTML = '<div class="empty-state"><h3>No tasks match your filters</h3><p>Try adjusting your filter criteria.</p></div>';
+                container.innerHTML = '<div class="empty-state"><h3>No tasks yet!</h3><p>Click "Add Task" to get started.</p></div>';
                 return;
             }
 
-            container.innerHTML = filteredTasks.map(task => renderTaskCard(task)).join('');
-        }
+            let html = '';
 
-        function renderListView() {
-            // Populate filter dropdowns
-            const categoryFilter = document.getElementById('filter-category');
-            categoryFilter.innerHTML = '<option value="all">All</option>';
+            // Get main categories (PITCH and APP)
+            const mainCats = getMainCategories();
 
-            const allCats = getAllCategoriesFlat();
-            allCats.forEach(cat => {
-                const displayName = getCategoryFullPath(cat.id);
-                categoryFilter.innerHTML += `<option value="${cat.id}">${displayName}</option>`;
+            mainCats.forEach(mainCat => {
+                const subs = getSubcategories(mainCat.id);
+
+                // Count tasks in this main category
+                const taskCount = filteredTasks.filter(t => {
+                    const taskCat = getCategoryById(t.category);
+                    return taskCat && (taskCat.parentId === mainCat.id || taskCat.id === mainCat.id);
+                }).length;
+
+                html += `
+                    <div class="accordion-main">
+                        <div class="accordion-main-header" onclick="toggleMainAccordion('${mainCat.id}')">
+                            <span>${mainCat.name} (${taskCount})</span>
+                            <span class="arrow">▶</span>
+                        </div>
+                        <div class="accordion-main-content" id="main-${mainCat.id}">
+                `;
+
+                // Render subcategories
+                subs.forEach(subCat => {
+                    const subTasks = filteredTasks.filter(t => t.category === subCat.id);
+
+                    html += `
+                        <div class="accordion-sub">
+                            <div class="accordion-sub-header" onclick="toggleSubAccordion('${subCat.id}')">
+                                <span>${subCat.name} (${subTasks.length})</span>
+                                <span class="arrow">▶</span>
+                            </div>
+                            <div class="accordion-sub-content" id="sub-${subCat.id}">
+                    `;
+
+                    if (subTasks.length === 0) {
+                        html += '<div style="padding: 10px 0; opacity: 0.6; font-size: 13px;">No tasks</div>';
+                    } else {
+                        // Sort tasks by due date
+                        subTasks.sort((a, b) => {
+                            if (!a.dueDate && !b.dueDate) return 0;
+                            if (!a.dueDate) return 1;
+                            if (!b.dueDate) return -1;
+                            return new Date(a.dueDate) - new Date(b.dueDate);
+                        });
+                        html += subTasks.map(task => renderTaskCard(task)).join('');
+                    }
+
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `
+                        </div>
+                    </div>
+                `;
             });
 
-            // Apply filters and sort
-            applyFiltersAndSort();
+            container.innerHTML = html;
+        }
+
+        function toggleMainAccordion(mainCatId) {
+            const header = event.target.closest('.accordion-main-header');
+            const content = document.getElementById(`main-${mainCatId}`);
+
+            header.classList.toggle('active');
+            content.classList.toggle('active');
+        }
+
+        function toggleSubAccordion(subCatId) {
+            const header = event.target.closest('.accordion-sub-header');
+            const content = document.getElementById(`sub-${subCatId}`);
+
+            header.classList.toggle('active');
+            content.classList.toggle('active');
         }
 
         function renderTaskCard(task) {
@@ -1597,10 +1714,10 @@
             const assignedClass = `assigned-${task.assignedTo.toLowerCase()}`;
             const completedClass = task.status === 'Completed' ? 'status-completed' : '';
 
-            const dueDate = new Date(task.dueDate).toLocaleDateString('en-GB', {
+            const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-GB', {
                 day: 'numeric',
                 month: 'short'
-            });
+            }) : 'Unallocated';
 
             const categoryPath = getCategoryFullPath(task.category);
 
@@ -1626,13 +1743,16 @@
         function renderTimelineView() {
             const container = document.getElementById('timeline-content');
 
-            if (tasks.length === 0) {
-                container.innerHTML = '<div class="empty-state"><h3>No tasks yet!</h3><p>Add tasks to see the timeline view.</p></div>';
+            // Only show tasks with due dates in timeline
+            const tasksWithDates = tasks.filter(t => t.dueDate);
+
+            if (tasksWithDates.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>No tasks with due dates!</h3><p>Add due dates to tasks to see them in the timeline view.</p></div>';
                 return;
             }
 
             // Sort tasks by start date
-            const sortedTasks = [...tasks].sort((a, b) => {
+            const sortedTasks = [...tasksWithDates].sort((a, b) => {
                 const aStart = new Date(a.dueDate);
                 aStart.setDate(aStart.getDate() - (a.duration || 1) + 1);
                 const bStart = new Date(b.dueDate);
