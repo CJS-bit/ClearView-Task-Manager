@@ -1,0 +1,2033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClearView Task Manager</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --color-red: #C25B70;
+            --color-green: #5DFDA8;
+            --color-orange: #E6B589;
+            --color-grey: #E8E8E8;
+            --color-dark-grey: #4A4A4A;
+            --color-text: #333333;
+
+            /* Main category colors */
+            --color-pitch: #6FB3D4;
+            --color-app: #9E6DD4;
+
+            /* Person colors */
+            --color-terry: #5B2C91;
+            --color-caroline: #0F7D8A;
+            --color-both: #E6B589;
+            --color-unassigned: #A0A0A0;
+
+            /* PITCH subcategory colors (blue shades) */
+            --color-pitch-app: #A8D5E2;
+            --color-pitch-tide: #6FB3D4;
+
+            /* APP subcategory colors (purple shades) */
+            --color-app-design-ui: #E6D5F5;
+            --color-app-design-coding: #D1B3EC;
+            --color-app-coding: #B88FE0;
+            --color-app-copywriting: #9E6DD4;
+            --color-app-bugs: #8550C7;
+            --color-app-security: #6B36BA;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+            min-height: 100vh;
+            height: calc(100vh - 200px);
+            color: var(--color-text);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: var(--color-text);
+            margin: 0;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-tabs button {
+            padding: 12px 24px;
+            border: 2px solid var(--color-grey);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: white;
+            color: var(--color-text);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-tabs button:hover {
+            border-color: var(--color-dark-grey);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-tabs button.active {
+            background: var(--color-dark-grey);
+            color: black;
+            border-color: var(--color-dark-grey);
+        }
+
+        .view-container {
+            display: none;
+        }
+
+        .view-container.active {
+            display: block;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: var(--color-dark-grey);
+            color: black;
+        }
+
+        .btn-primary:hover {
+            background: #333333;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-secondary {
+            background: var(--color-grey);
+            color: var(--color-text);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-dark-grey);
+            color: black;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        /* Dashboard Styles */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 480px 240px 240px;
+            grid-template-rows: 240px 240px;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            padding: 25px;
+            border-radius: 16px;
+            background: white;
+            border: 2px solid var(--color-grey);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-card.large {
+            grid-row: span 2;
+        }
+
+        .stat-card.top-right {
+            grid-column: 2 / 4;
+        }
+
+        .stat-card h3 {
+            font-size: 15px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--color-text);
+            font-weight: 700;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 420px;
+        }
+
+        .chart-container.small {
+            height: 135px;
+        }
+
+        .stats-numbers {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--color-grey);
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .stat-value.orange {
+            color: var(--color-orange);
+        }
+
+        .stat-value.green {
+            color: var(--color-green);
+        }
+
+        .upcoming-tasks-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .upcoming-task-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .upcoming-task-category-section {
+            padding: 8px 10px;
+            font-size: 10px;
+        }
+
+        .upcoming-task-person-section {
+            padding: 8px 10px;
+            font-size: 10px;
+            color: white;
+        }
+
+        .upcoming-task-main-section {
+            flex: 1;
+            padding: 8px 12px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .upcoming-task-date {
+            margin-right: 10px;
+            font-weight: 700;
+        }
+
+        .upcoming-task-name {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Task Card Styles */
+        .task-card {
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            display: flex;
+            overflow: hidden;
+            align-items: stretch;
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+        }
+
+        .task-card.status-completed {
+            opacity: 0.6;
+        }
+
+        .task-card-category {
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-text);
+            min-width: 150px;
+        }
+
+        .task-card-person {
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: white;
+            min-width: 100px;
+        }
+
+        .task-card-main {
+            flex: 1;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 13px;
+            align-items: center;
+        }
+
+        .due-date-badge {
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .due-date-badge.on-track {
+            background: var(--color-green);
+        }
+
+        .due-date-badge.due-soon {
+            background: var(--color-orange);
+        }
+
+        .due-date-badge.overdue {
+            background: var(--color-red);
+        }
+
+        .due-date-badge.unallocated {
+            background: var(--color-dark-grey);
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        /* Form Styles */
+        .form-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .form-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-modal {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-modal h2 {
+            color: var(--color-text);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--color-text);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--color-grey);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            background: white;
+            color: var(--color-text);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--color-dark-grey);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--color-dark-grey);
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-group select option {
+            background: white;
+            color: var(--color-text);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            cursor: pointer;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        /* List View Styles */
+        .list-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            border: 2px solid var(--color-grey);
+        }
+
+        .filter-controls .checkbox-group {
+            margin-bottom: 0;
+        }
+
+        /* Accordion Styles */
+        .accordion-main {
+            margin-bottom: 12px;
+        }
+
+        .accordion-main-header {
+            padding: 15px 20px;
+            background: var(--color-dark-grey);
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            border: 2px solid var(--color-dark-grey);
+        }
+
+        .accordion-main-header:hover {
+            background: #333333;
+        }
+
+        .accordion-main-header .arrow {
+            transition: transform 0.3s;
+            font-size: 14px;
+        }
+
+        .accordion-main-header.active .arrow {
+            transform: rotate(90deg);
+        }
+
+        .accordion-main-content {
+            display: none;
+            padding: 10px 0 0 20px;
+        }
+
+        .accordion-main-content.active {
+            display: block;
+        }
+
+        .accordion-sub {
+            margin-bottom: 8px;
+        }
+
+        .accordion-sub-header {
+            padding: 12px 18px;
+            background: var(--color-grey);
+            color: var(--color-text);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .accordion-sub-header:hover {
+            background: #d8d8d8;
+        }
+
+        .accordion-sub-header .arrow {
+            transition: transform 0.3s;
+            font-size: 12px;
+        }
+
+        .accordion-sub-header.active .arrow {
+            transform: rotate(90deg);
+        }
+
+        .accordion-sub-content {
+            display: none;
+            padding: 8px 0 0 0;
+        }
+
+        .accordion-sub-content.active {
+            display: block;
+        }
+
+        .filter-controls select {
+            padding: 8px 12px;
+            border: 2px solid var(--color-grey);
+            border-radius: 8px;
+            font-size: 13px;
+            background: white;
+            color: var(--color-text);
+            cursor: pointer;
+        }
+
+        .filter-controls label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-text);
+            margin-right: 5px;
+        }
+
+        .tasks-list {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid var(--color-grey);
+        }
+
+        /* Timeline/Gantt View Styles */
+        .timeline-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid var(--color-grey);
+            overflow-x: auto;
+        }
+
+        .timeline-grid {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 0;
+            min-width: 1000px;
+        }
+
+        .timeline-header {
+            display: contents;
+        }
+
+        .timeline-label {
+            padding: 15px;
+            font-weight: 600;
+            background: var(--color-grey);
+            border-bottom: 2px solid var(--color-dark-grey);
+            color: var(--color-text);
+        }
+
+        .timeline-dates {
+            display: flex;
+            background: var(--color-grey);
+            border-bottom: 2px solid var(--color-dark-grey);
+        }
+
+        .timeline-date-cell {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            font-size: 12px;
+            border-left: 1px solid var(--color-dark-grey);
+            color: var(--color-text);
+        }
+
+        .timeline-row {
+            display: contents;
+        }
+
+        .timeline-task-name {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--color-grey);
+            display: flex;
+            align-items: center;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            background: white;
+            border: 2px solid var(--color-grey);
+            border-radius: 8px;
+            margin: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--color-text);
+        }
+
+        .timeline-task-name:hover {
+            background: var(--color-grey);
+        }
+
+        .timeline-task-bar-container {
+            position: relative;
+            border-bottom: 1px solid var(--color-grey);
+            padding: 4px 0;
+        }
+
+        .timeline-bars {
+            position: relative;
+            height: 28px;
+            display: flex;
+            align-items: center;
+        }
+
+        .timeline-bar {
+            position: absolute;
+            height: 24px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            font-size: 10px;
+            font-weight: 600;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s;
+            border: 2px solid;
+            color: black;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .timeline-bar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Timeline bars will be colored by subcategory via inline styles */
+        .timeline-bar {
+            /* Background color set via inline style based on subcategory */
+        }
+
+        .timeline-bar.status-completed {
+            opacity: 0.6;
+        }
+
+        .timeline-bar.blocked {
+            border: 3px solid var(--color-red);
+        }
+
+        .timeline-person-indicator {
+            position: absolute;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .timeline-person-indicator.person-terry {
+            background: var(--color-terry);
+        }
+
+        .timeline-person-indicator.person-caroline {
+            background: var(--color-caroline);
+        }
+
+        .timeline-person-indicator.person-both {
+            background: var(--color-both);
+        }
+
+        .timeline-person-indicator.person-unassigned {
+            background: var(--color-unassigned);
+        }
+
+        /* Dependency Lines */
+        .dependency-line {
+            position: absolute;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .dependency-line path {
+            fill: none;
+            stroke-width: 2;
+            transition: stroke 0.3s;
+        }
+
+        .dependency-line.blocked path {
+            stroke: var(--color-red);
+        }
+
+        .dependency-line.resolved path {
+            stroke: var(--color-green);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--color-dark-grey);
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        /* Unallocated Tasks Section */
+        .unallocated-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid var(--color-grey);
+            margin-bottom: 20px;
+        }
+
+        .unallocated-section h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: var(--color-text);
+            font-weight: 700;
+        }
+
+        .unallocated-task-item {
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .unallocated-task-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
+        }
+
+        .unallocated-task-category {
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .unallocated-task-person {
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .unallocated-task-name {
+            flex: 1;
+            font-weight: 600;
+        }
+
+        /* Manage Categories Modal */
+        .category-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: var(--color-grey);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .category-item.subcategory {
+            margin-left: 20px;
+            background: rgba(232, 232, 232, 0.5);
+        }
+
+        .category-add-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .category-add-form input {
+            flex: 1;
+        }
+
+        .category-select-parent {
+            margin-bottom: 15px;
+        }
+
+        .category-select-parent select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid var(--color-grey);
+            border-radius: 8px;
+            background: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card.large {
+                grid-row: span 1;
+            }
+
+            .timeline-grid {
+                min-width: 800px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <nav class="nav-tabs">
+                <button class="active" data-view="dashboard">Dashboard</button>
+                <button data-view="list">List View</button>
+                <button data-view="timeline">Timeline View</button>
+            </nav>
+            <h1>ClearView Task Manager</h1>
+        </header>
+
+        <!-- Dashboard View -->
+        <div id="dashboard-view" class="view-container active">
+            <div class="dashboard-grid">
+                <div class="stat-card large">
+                    <h3>Overall Status</h3>
+                    <div class="chart-container">
+                        <canvas id="overall-chart"></canvas>
+                    </div>
+                </div>
+                <div class="stat-card top-right">
+                    <h3>Days Overview</h3>
+                    <div class="chart-container small">
+                        <canvas id="overview-chart"></canvas>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <h3>Statistics</h3>
+                    <div class="stats-numbers">
+                        <div class="stat-row">
+                            <span class="stat-label">Total Tasks</span>
+                            <span class="stat-value" id="stat-total">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label orange">Outstanding</span>
+                            <span class="stat-value orange" id="stat-outstanding">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label green">Completed</span>
+                            <span class="stat-value green" id="stat-completed">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <h3>Next 4 Due</h3>
+                    <div class="upcoming-tasks-bars" id="upcoming-tasks-bars">
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 20px;">
+                <button class="btn btn-primary" onclick="openTaskForm()">+ Add New Task</button>
+                <button class="btn btn-secondary" onclick="openCategoriesModal()">Manage Categories</button>
+            </div>
+
+            <div class="tasks-list">
+                <h2 style="margin-bottom: 20px;">Upcoming Tasks</h2>
+                <div id="dashboard-tasks"></div>
+            </div>
+        </div>
+
+        <!-- List View -->
+        <div id="list-view" class="view-container">
+            <div class="list-controls">
+                <h2>All Tasks</h2>
+                <div>
+                    <button class="btn btn-primary btn-small" onclick="openTaskForm()">+ Add Task</button>
+                    <button class="btn btn-secondary btn-small" onclick="openCategoriesModal()">Categories</button>
+                </div>
+            </div>
+
+            <div class="filter-controls">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="show-all" onchange="renderListView()" checked>
+                    <label for="show-all">Show All</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="show-outstanding" onchange="renderListView()">
+                    <label for="show-outstanding">Show All Outstanding</label>
+                </div>
+            </div>
+
+            <div class="tasks-list">
+                <div id="list-tasks"></div>
+            </div>
+        </div>
+
+        <!-- Timeline View -->
+        <div id="timeline-view" class="view-container">
+            <div class="list-controls">
+                <h2>Timeline / Gantt View</h2>
+                <button class="btn btn-primary btn-small" onclick="openTaskForm()">+ Add Task</button>
+            </div>
+            <div class="timeline-container">
+                <svg id="dependency-svg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5;"></svg>
+                <div id="timeline-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Form Modal -->
+    <div id="task-form-overlay" class="form-overlay">
+        <div class="form-modal">
+            <h2 id="form-title">Add New Task</h2>
+            <form id="task-form" onsubmit="saveTask(event)">
+                <div class="form-group">
+                    <label for="task-name">Task Name *</label>
+                    <input type="text" id="task-name" required placeholder="Enter task name...">
+                </div>
+
+                <div class="form-group">
+                    <label for="task-description">Description</label>
+                    <textarea id="task-description" placeholder="Task details..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="task-category">Category *</label>
+                    <select id="task-category" required>
+                        <option value="">Select category...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="task-assigned">Assigned To *</label>
+                    <select id="task-assigned" required>
+                        <option value="">Select person...</option>
+                        <option value="Terry">Terry</option>
+                        <option value="Caroline">Caroline</option>
+                        <option value="Both">Both</option>
+                        <option value="Unassigned">Choose later</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="task-duration">Duration (days) *</label>
+                    <input type="number" id="task-duration" required min="1" value="1" placeholder="Number of days">
+                </div>
+
+                <div class="form-group">
+                    <label for="task-due-date">Due Date (leave blank for unallocated)</label>
+                    <input type="date" id="task-due-date">
+                </div>
+
+                <div class="form-group">
+                    <label for="task-status">Status *</label>
+                    <select id="task-status" required>
+                        <option value="Not Started">Not Started</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="task-has-dependencies" onchange="toggleDependencies()">
+                    <label for="task-has-dependencies">Dependent on prior task(s)</label>
+                </div>
+
+                <div class="form-group" id="dependencies-group" style="display: none;">
+                    <label for="task-dependencies">Select Dependencies</label>
+                    <select id="task-dependencies" multiple size="5">
+                    </select>
+                    <small style="opacity: 0.8; font-size: 12px;">Hold Ctrl/Cmd to select multiple tasks</small>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeTaskForm()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Categories Modal -->
+    <div id="categories-modal" class="form-overlay">
+        <div class="form-modal">
+            <h2>Manage Categories</h2>
+            <div class="category-list" id="category-list"></div>
+            <div class="category-select-parent">
+                <label for="parent-category-select">Select Parent Category (PITCH or APP) *:</label>
+                <select id="parent-category-select">
+                    <option value="">-- Select Parent --</option>
+                </select>
+            </div>
+            <div class="category-add-form">
+                <input type="text" id="new-category-name" placeholder="New category name...">
+                <button class="btn btn-primary btn-small" onclick="addCategory()">Add Category</button>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="closeCategoriesModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Store
+        let tasks = [];
+        let categories = [
+            { id: 'pitch', name: 'PITCH', parentId: null, isMainCategory: true },
+            { id: 'pitch-app', name: 'App Pitch', parentId: 'pitch', isMainCategory: false },
+            { id: 'pitch-tide', name: 'Tide Pitch', parentId: 'pitch', isMainCategory: false },
+            { id: 'app', name: 'APP', parentId: null, isMainCategory: true },
+            { id: 'app-design-ui', name: 'Design UI', parentId: 'app', isMainCategory: false },
+            { id: 'app-design-coding', name: 'Design Coding', parentId: 'app', isMainCategory: false },
+            { id: 'app-coding', name: 'Coding', parentId: 'app', isMainCategory: false },
+            { id: 'app-copywriting', name: 'Copywriting', parentId: 'app', isMainCategory: false },
+            { id: 'app-bugs', name: 'Bugs/Changes', parentId: 'app', isMainCategory: false },
+            { id: 'app-security', name: 'Security/GDPR/Protocols', parentId: 'app', isMainCategory: false }
+        ];
+        let currentView = 'dashboard';
+        let editingTaskId = null;
+        let overallChart = null;
+        let overviewChart = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            renderCurrentView();
+            setupNavigation();
+        });
+
+        // Navigation
+        function setupNavigation() {
+            document.querySelectorAll('.nav-tabs button').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.nav-tabs button').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
+
+                    const view = this.dataset.view;
+                    currentView = view;
+                    document.getElementById(`${view}-view`).classList.add('active');
+
+                    renderCurrentView();
+                });
+            });
+        }
+
+        // Data Management
+        function loadData() {
+            const savedTasks = localStorage.getItem('clearview_tasks');
+            const savedCategories = localStorage.getItem('clearview_categories');
+
+            if (savedTasks) {
+                tasks = JSON.parse(savedTasks);
+            }
+
+            if (savedCategories) {
+                const loadedCategories = JSON.parse(savedCategories);
+                // Migrate old string-based categories to new object format
+                if (loadedCategories.length > 0 && typeof loadedCategories[0] === 'string') {
+                    categories = loadedCategories.map((cat, idx) => ({
+                        id: String(idx + 1),
+                        name: cat,
+                        parentId: null
+                    }));
+                    saveData(); // Save migrated data
+                } else {
+                    categories = loadedCategories;
+                }
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('clearview_tasks', JSON.stringify(tasks));
+            localStorage.setItem('clearview_categories', JSON.stringify(categories));
+        }
+
+        // Category Helper Functions
+        function getCategoryById(id) {
+            return categories.find(c => c.id === id);
+        }
+
+        function getSubcategoryColor(categoryId) {
+            const colorMap = {
+                'pitch-app': '#A8D5E2',
+                'pitch-tide': '#6FB3D4',
+                'app-design-ui': '#E6D5F5',
+                'app-design-coding': '#D1B3EC',
+                'app-coding': '#B88FE0',
+                'app-copywriting': '#9E6DD4',
+                'app-bugs': '#8550C7',
+                'app-security': '#6B36BA'
+            };
+            return colorMap[categoryId] || '#CCCCCC';
+        }
+
+        function getMainCategoryColor(categoryId) {
+            const category = getCategoryById(categoryId);
+            if (!category) return '#CCCCCC';
+
+            const parent = category.parentId ? getCategoryById(category.parentId) : category;
+            if (parent && parent.id === 'pitch') return '#6FB3D4';
+            if (parent && parent.id === 'app') return '#9E6DD4';
+            return '#CCCCCC';
+        }
+
+        function getPersonColor(assignedTo) {
+            const colorMap = {
+                'Terry': '#5B2C91',
+                'Caroline': '#0F7D8A',
+                'Both': '#E6B589',
+                'Unassigned': '#A0A0A0'
+            };
+            return colorMap[assignedTo] || '#A0A0A0';
+        }
+
+        function getCategoryFullPath(categoryId) {
+            const category = getCategoryById(categoryId);
+            if (!category) return '';
+
+            if (category.parentId) {
+                const parent = getCategoryById(category.parentId);
+                return parent ? `${parent.name} > ${category.name}` : category.name;
+            }
+            return category.name;
+        }
+
+        function getMainCategories() {
+            return categories.filter(c => !c.parentId);
+        }
+
+        function getSubcategories(parentId) {
+            return categories.filter(c => c.parentId === parentId);
+        }
+
+        function getAllCategoriesFlat() {
+            const result = [];
+            const mainCats = getMainCategories();
+
+            mainCats.forEach(mainCat => {
+                result.push(mainCat);
+                const subs = getSubcategories(mainCat.id);
+                subs.forEach(sub => result.push(sub));
+            });
+
+            return result;
+        }
+
+        // Task Management
+        function openTaskForm(taskId = null) {
+            editingTaskId = taskId;
+            const overlay = document.getElementById('task-form-overlay');
+            const form = document.getElementById('task-form');
+            const title = document.getElementById('form-title');
+
+            // Populate categories hierarchically - only show subcategories (not main categories)
+            const categorySelect = document.getElementById('task-category');
+            categorySelect.innerHTML = '<option value="">Select category...</option>';
+
+            const mainCats = getMainCategories();
+            mainCats.forEach(mainCat => {
+                const subs = getSubcategories(mainCat.id);
+                if (subs.length > 0) {
+                    categorySelect.innerHTML += `<option disabled>─── ${mainCat.name} ───</option>`;
+                    subs.forEach(sub => {
+                        categorySelect.innerHTML += `<option value="${sub.id}">  ${sub.name}</option>`;
+                    });
+                }
+            });
+
+            // Populate dependencies
+            updateDependenciesList();
+
+            if (taskId) {
+                title.textContent = 'Edit Task';
+                const task = tasks.find(t => t.id === taskId);
+                if (task) {
+                    document.getElementById('task-name').value = task.name;
+                    document.getElementById('task-description').value = task.description || '';
+                    document.getElementById('task-category').value = task.category;
+                    document.getElementById('task-assigned').value = task.assignedTo;
+                    document.getElementById('task-duration').value = task.duration || 1;
+                    document.getElementById('task-due-date').value = task.dueDate;
+                    document.getElementById('task-status').value = task.status;
+
+                    if (task.dependencies && task.dependencies.length > 0) {
+                        document.getElementById('task-has-dependencies').checked = true;
+                        toggleDependencies();
+                        const depSelect = document.getElementById('task-dependencies');
+                        Array.from(depSelect.options).forEach(option => {
+                            if (task.dependencies.includes(option.value)) {
+                                option.selected = true;
+                            }
+                        });
+                    }
+                }
+            } else {
+                title.textContent = 'Add New Task';
+                form.reset();
+                document.getElementById('task-duration').value = 1;
+                document.getElementById('dependencies-group').style.display = 'none';
+            }
+
+            overlay.classList.add('active');
+        }
+
+        function closeTaskForm() {
+            document.getElementById('task-form-overlay').classList.remove('active');
+            document.getElementById('task-form').reset();
+            editingTaskId = null;
+        }
+
+        function toggleDependencies() {
+            const checkbox = document.getElementById('task-has-dependencies');
+            const group = document.getElementById('dependencies-group');
+            group.style.display = checkbox.checked ? 'block' : 'none';
+        }
+
+        function updateDependenciesList() {
+            const depSelect = document.getElementById('task-dependencies');
+            depSelect.innerHTML = '';
+
+            tasks.filter(t => t.id !== editingTaskId).forEach(task => {
+                const categoryPath = getCategoryFullPath(task.category);
+                depSelect.innerHTML += `<option value="${task.id}">${task.name} (${categoryPath})</option>`;
+            });
+        }
+
+        function saveTask(event) {
+            event.preventDefault();
+
+            const taskData = {
+                id: editingTaskId || Date.now().toString(),
+                name: document.getElementById('task-name').value,
+                description: document.getElementById('task-description').value,
+                category: document.getElementById('task-category').value,
+                assignedTo: document.getElementById('task-assigned').value,
+                duration: parseInt(document.getElementById('task-duration').value) || 1,
+                dueDate: document.getElementById('task-due-date').value,
+                status: document.getElementById('task-status').value,
+                dependencies: [],
+                createdAt: new Date().toISOString()
+            };
+
+            if (document.getElementById('task-has-dependencies').checked) {
+                const depSelect = document.getElementById('task-dependencies');
+                taskData.dependencies = Array.from(depSelect.selectedOptions).map(opt => opt.value);
+            }
+
+            if (editingTaskId) {
+                const index = tasks.findIndex(t => t.id === editingTaskId);
+                tasks[index] = { ...tasks[index], ...taskData };
+            } else {
+                tasks.push(taskData);
+            }
+
+            saveData();
+            closeTaskForm();
+            renderCurrentView();
+        }
+
+        function deleteTask(taskId) {
+            if (confirm('Are you sure you want to delete this task?')) {
+                tasks = tasks.filter(t => t.id !== taskId);
+                // Remove this task from other tasks' dependencies
+                tasks.forEach(task => {
+                    if (task.dependencies) {
+                        task.dependencies = task.dependencies.filter(dep => dep !== taskId);
+                    }
+                });
+                saveData();
+                renderCurrentView();
+            }
+        }
+
+        function toggleTaskComplete(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.status = task.status === 'Completed' ? 'In Progress' : 'Completed';
+                saveData();
+                renderCurrentView();
+            }
+        }
+
+        // Category Management
+        function openCategoriesModal() {
+            document.getElementById('categories-modal').classList.add('active');
+            renderCategories();
+            populateParentCategorySelect();
+        }
+
+        function closeCategoriesModal() {
+            document.getElementById('categories-modal').classList.remove('active');
+        }
+
+        function populateParentCategorySelect() {
+            const select = document.getElementById('parent-category-select');
+            select.innerHTML = '<option value="">-- Main Category --</option>';
+
+            const mainCats = getMainCategories();
+            mainCats.forEach(cat => {
+                select.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
+            });
+        }
+
+        function renderCategories() {
+            const list = document.getElementById('category-list');
+            list.innerHTML = '';
+
+            const mainCats = getMainCategories();
+
+            mainCats.forEach(mainCat => {
+                // Main categories (PITCH and APP) cannot be deleted
+                list.innerHTML += `
+                    <div class="category-item">
+                        <span><strong>${mainCat.name}</strong></span>
+                    </div>
+                `;
+
+                const subs = getSubcategories(mainCat.id);
+                subs.forEach(sub => {
+                    list.innerHTML += `
+                        <div class="category-item subcategory">
+                            <span>→ ${sub.name}</span>
+                            <button class="btn btn-secondary btn-small" onclick="deleteCategory('${sub.id}')">Delete</button>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        function addCategory() {
+            const input = document.getElementById('new-category-name');
+            const name = input.value.trim();
+            const parentId = document.getElementById('parent-category-select').value;
+
+            if (!name) return;
+
+            // Must select a parent category (PITCH or APP)
+            if (!parentId) {
+                alert('Please select a parent category (PITCH or APP).');
+                return;
+            }
+
+            // Check for duplicate names within same parent
+            const siblings = getSubcategories(parentId);
+            if (siblings.some(cat => cat.name.toLowerCase() === name.toLowerCase())) {
+                alert('A category with this name already exists under this parent.');
+                return;
+            }
+
+            const newCategory = {
+                id: Date.now().toString(),
+                name: name,
+                parentId: parentId,
+                isMainCategory: false
+            };
+
+            categories.push(newCategory);
+            saveData();
+            renderCategories();
+            populateParentCategorySelect();
+            input.value = '';
+        }
+
+        function deleteCategory(catId) {
+            const category = getCategoryById(catId);
+            if (!category) return;
+
+            // Check if it has subcategories
+            const subs = getSubcategories(catId);
+            if (subs.length > 0) {
+                if (!confirm(`"${category.name}" has subcategories. Deleting it will also delete all subcategories. Continue?`)) {
+                    return;
+                }
+                // Delete all subcategories
+                subs.forEach(sub => {
+                    categories = categories.filter(c => c.id !== sub.id);
+                });
+            }
+
+            // Check if any tasks use this category
+            const tasksUsingCat = tasks.filter(t => t.category === catId);
+            if (tasksUsingCat.length > 0) {
+                if (!confirm(`${tasksUsingCat.length} task(s) use this category. They will need to be reassigned. Continue?`)) {
+                    return;
+                }
+            }
+
+            categories = categories.filter(c => c.id !== catId);
+            saveData();
+            renderCategories();
+            populateParentCategorySelect();
+        }
+
+        // Status Calculation
+        function getTaskStatus(task) {
+            if (task.status === 'Completed') {
+                return 'completed';
+            }
+
+            // Tasks without a due date are unallocated
+            if (!task.dueDate) {
+                return 'unallocated';
+            }
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const dueDate = new Date(task.dueDate);
+            dueDate.setHours(0, 0, 0, 0);
+            const daysUntilDue = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+
+            if (daysUntilDue < 0) {
+                return 'overdue';
+            } else if (daysUntilDue <= 2) {
+                return 'due-soon';
+            } else {
+                return 'on-track';
+            }
+        }
+
+        function isTaskBlocked(task) {
+            if (!task.dependencies || task.dependencies.length === 0) {
+                return false;
+            }
+
+            return task.dependencies.some(depId => {
+                const depTask = tasks.find(t => t.id === depId);
+                return depTask && depTask.status !== 'Completed';
+            });
+        }
+
+        // Rendering
+        function renderCurrentView() {
+            switch(currentView) {
+                case 'dashboard':
+                    renderDashboard();
+                    break;
+                case 'list':
+                    renderListView();
+                    break;
+                case 'timeline':
+                    renderTimelineView();
+                    break;
+            }
+        }
+
+        function renderDashboard() {
+            // Calculate stats
+            const total = tasks.length;
+            const completed = tasks.filter(t => t.status === 'Completed').length;
+            const outstanding = total - completed;
+
+            const outstandingTerry = tasks.filter(t => t.status !== 'Completed' && t.assignedTo === 'Terry').length;
+            const outstandingCaroline = tasks.filter(t => t.status !== 'Completed' && t.assignedTo === 'Caroline').length;
+            const outstandingBoth = tasks.filter(t => t.status !== 'Completed' && t.assignedTo === 'Both').length;
+            const outstandingUnassigned = tasks.filter(t => t.status !== 'Completed' && t.assignedTo === 'Unassigned').length;
+
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-outstanding').textContent = outstanding;
+            document.getElementById('stat-completed').textContent = completed;
+
+            // Overall Status Chart (Completed vs Outstanding Donut)
+            const overallCtx = document.getElementById('overall-chart');
+            if (overallChart) {
+                overallChart.destroy();
+            }
+
+            overallChart = new Chart(overallCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Outstanding', 'Completed'],
+                    datasets: [{
+                        data: [outstanding, completed],
+                        backgroundColor: ['#C25B70', '#5DFDA8'],
+                        borderWidth: 6,
+                        borderColor: '#ffffff',
+                        hoverOffset: 20,
+                        offset: 5,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '50%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.parsed + ' tasks';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Task Overview Chart (Horizontal Days Bar)
+            const overviewCtx = document.getElementById('overview-chart');
+            if (overviewChart) {
+                overviewChart.destroy();
+            }
+
+            // Calculate total days for each category
+            const totalOutstandingDays = tasks
+                .filter(t => t.status !== 'Completed')
+                .reduce((sum, t) => sum + (t.duration || 1), 0);
+
+            const unassignedDays = tasks
+                .filter(t => t.status !== 'Completed' && t.assignedTo === 'Unassigned')
+                .reduce((sum, t) => sum + (t.duration || 1), 0);
+
+            const terryDays = tasks
+                .filter(t => t.status !== 'Completed' && t.assignedTo === 'Terry')
+                .reduce((sum, t) => sum + (t.duration || 1), 0);
+
+            const carolineDays = tasks
+                .filter(t => t.status !== 'Completed' && t.assignedTo === 'Caroline')
+                .reduce((sum, t) => sum + (t.duration || 1), 0);
+
+            const bothDays = tasks
+                .filter(t => t.status !== 'Completed' && t.assignedTo === 'Both')
+                .reduce((sum, t) => sum + (t.duration || 1), 0);
+
+            overviewChart = new Chart(overviewCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Total Outstanding', 'Unassigned', 'Terry', 'Caroline', 'Both'],
+                    datasets: [{
+                        data: [totalOutstandingDays, unassignedDays, terryDays, carolineDays, bothDays],
+                        backgroundColor: ['#A0A0A0', '#A0A0A0', '#5B2C91', '#0F7D8A', '#E6B589'],
+                        borderRadius: 6,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.x + ' days';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: totalOutstandingDays + 2,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Render next 4 due tasks bars
+            const next4Tasks = tasks
+                .filter(t => t.status !== 'Completed' && t.dueDate)
+                .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+                .slice(0, 4);
+
+            const upcomingBarsContainer = document.getElementById('upcoming-tasks-bars');
+
+            if (next4Tasks.length === 0) {
+                upcomingBarsContainer.innerHTML = '<div style="text-align: center; opacity: 0.6; padding: 20px;">No upcoming tasks</div>';
+            } else {
+                upcomingBarsContainer.innerHTML = next4Tasks.map(task => {
+                    const dueDate = new Date(task.dueDate).toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'short'
+                    });
+                    const subcategoryColor = getSubcategoryColor(task.category);
+                    const personColor = getPersonColor(task.assignedTo);
+                    const mainCategoryColor = getMainCategoryColor(task.category);
+                    const categoryPath = getCategoryFullPath(task.category);
+
+                    return `
+                        <div class="upcoming-task-bar" onclick="openTaskForm('${task.id}')" style="cursor: pointer;">
+                            <div class="upcoming-task-category-section" style="background-color: ${subcategoryColor};">
+                                ${categoryPath.split(' > ')[1] || categoryPath}
+                            </div>
+                            <div class="upcoming-task-person-section" style="background-color: ${personColor};">
+                                ${task.assignedTo}
+                            </div>
+                            <div class="upcoming-task-main-section" style="background-color: ${mainCategoryColor};">
+                                <span class="upcoming-task-date">${dueDate}</span>
+                                <span class="upcoming-task-name">${task.name}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Render upcoming tasks - show tasks with due dates first, then unallocated
+            const upcomingTasks = tasks
+                .filter(t => t.status !== 'Completed')
+                .sort((a, b) => {
+                    if (!a.dueDate && !b.dueDate) return 0;
+                    if (!a.dueDate) return 1;
+                    if (!b.dueDate) return -1;
+                    return new Date(a.dueDate) - new Date(b.dueDate);
+                });
+
+            const container = document.getElementById('dashboard-tasks');
+
+            if (upcomingTasks.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>No tasks yet!</h3><p>Click "Add New Task" to get started.</p></div>';
+                return;
+            }
+
+            container.innerHTML = upcomingTasks.map(task => renderTaskCard(task)).join('');
+        }
+
+        function renderListView() {
+            const container = document.getElementById('list-tasks');
+            const showAll = document.getElementById('show-all').checked;
+            const showOutstanding = document.getElementById('show-outstanding').checked;
+
+            // Determine which tasks to show
+            let filteredTasks = [...tasks];
+            if (showOutstanding && !showAll) {
+                filteredTasks = filteredTasks.filter(t => t.status !== 'Completed');
+            }
+
+            if (filteredTasks.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>No tasks yet!</h3><p>Click "Add Task" to get started.</p></div>';
+                return;
+            }
+
+            let html = '';
+
+            // Get main categories (PITCH and APP)
+            const mainCats = getMainCategories();
+
+            mainCats.forEach(mainCat => {
+                const subs = getSubcategories(mainCat.id);
+
+                // Count tasks in this main category
+                const taskCount = filteredTasks.filter(t => {
+                    const taskCat = getCategoryById(t.category);
+                    return taskCat && (taskCat.parentId === mainCat.id || taskCat.id === mainCat.id);
+                }).length;
+
+                html += `
+                    <div class="accordion-main">
+                        <div class="accordion-main-header" onclick="toggleMainAccordion('${mainCat.id}')">
+                            <span>${mainCat.name} (${taskCount})</span>
+                            <span class="arrow">▶</span>
+                        </div>
+                        <div class="accordion-main-content" id="main-${mainCat.id}">
+                `;
+
+                // Render subcategories
+                subs.forEach(subCat => {
+                    const subTasks = filteredTasks.filter(t => t.category === subCat.id);
+
+                    html += `
+                        <div class="accordion-sub">
+                            <div class="accordion-sub-header" onclick="toggleSubAccordion('${subCat.id}')">
+                                <span>${subCat.name} (${subTasks.length})</span>
+                                <span class="arrow">▶</span>
+                            </div>
+                            <div class="accordion-sub-content" id="sub-${subCat.id}">
+                    `;
+
+                    if (subTasks.length === 0) {
+                        html += '<div style="padding: 10px 0; opacity: 0.6; font-size: 13px;">No tasks</div>';
+                    } else {
+                        // Sort tasks by due date
+                        subTasks.sort((a, b) => {
+                            if (!a.dueDate && !b.dueDate) return 0;
+                            if (!a.dueDate) return 1;
+                            if (!b.dueDate) return -1;
+                            return new Date(a.dueDate) - new Date(b.dueDate);
+                        });
+                        html += subTasks.map(task => renderTaskCard(task)).join('');
+                    }
+
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function toggleMainAccordion(mainCatId) {
+            const header = event.target.closest('.accordion-main-header');
+            const content = document.getElementById(`main-${mainCatId}`);
+
+            header.classList.toggle('active');
+            content.classList.toggle('active');
+        }
+
+        function toggleSubAccordion(subCatId) {
+            const header = event.target.closest('.accordion-sub-header');
+            const content = document.getElementById(`sub-${subCatId}`);
+
+            header.classList.toggle('active');
+            content.classList.toggle('active');
+        }
+
+        function renderTaskCard(task) {
+            const status = getTaskStatus(task);
+            const completedClass = task.status === 'Completed' ? 'status-completed' : '';
+
+            const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'short'
+            }) : 'Unallocated';
+
+            const categoryPath = getCategoryFullPath(task.category);
+            const mainCategoryColor = getMainCategoryColor(task.category);
+            const subcategoryColor = getSubcategoryColor(task.category);
+            const personColor = getPersonColor(task.assignedTo);
+
+            return `
+                <div class="task-card ${completedClass}" onclick="openTaskForm('${task.id}')">
+                    <div class="task-card-category" style="background-color: ${subcategoryColor};">
+                        ${categoryPath}
+                    </div>
+                    <div class="task-card-person" style="background-color: ${personColor};">
+                        ${task.assignedTo}
+                    </div>
+                    <div class="task-card-main" style="background-color: ${mainCategoryColor};">
+                        <div class="task-title">${task.name}</div>
+                        <div class="task-meta">
+                            <span class="due-date-badge ${status}">${dueDate}</span>
+                            <div class="task-actions" onclick="event.stopPropagation();">
+                                <button class="btn btn-secondary btn-small" onclick="toggleTaskComplete('${task.id}')">
+                                    ${task.status === 'Completed' ? 'Undo' : 'Complete'}
+                                </button>
+                                <button class="btn btn-secondary btn-small" onclick="deleteTask('${task.id}')">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTimelineView() {
+            const container = document.getElementById('timeline-content');
+
+            // Get tasks without due dates (unallocated)
+            const unallocatedTasks = tasks.filter(t => !t.dueDate);
+
+            // Build unallocated section
+            let unallocatedHTML = '';
+            if (unallocatedTasks.length > 0) {
+                unallocatedHTML = '<div class="unallocated-section"><h3>Unallocated Tasks (No Due Date)</h3>';
+                unallocatedTasks.forEach(task => {
+                    const subcategoryColor = getSubcategoryColor(task.category);
+                    const personColor = getPersonColor(task.assignedTo);
+                    const categoryPath = getCategoryFullPath(task.category);
+
+                    unallocatedHTML += `
+                        <div class="unallocated-task-item" onclick="openTaskForm('${task.id}')">
+                            <div class="unallocated-task-category" style="background-color: ${subcategoryColor};">
+                                ${categoryPath}
+                            </div>
+                            <div class="unallocated-task-person" style="background-color: ${personColor};">
+                                ${task.assignedTo}
+                            </div>
+                            <div class="unallocated-task-name">${task.name}</div>
+                        </div>
+                    `;
+                });
+                unallocatedHTML += '</div>';
+            }
+
+            // Only show tasks with due dates in timeline
+            const tasksWithDates = tasks.filter(t => t.dueDate);
+
+            if (tasksWithDates.length === 0) {
+                container.innerHTML = unallocatedHTML + '<div class="empty-state"><h3>No tasks with due dates!</h3><p>Add due dates to tasks to see them in the timeline view.</p></div>';
+                return;
+            }
+
+            // Sort tasks by start date
+            const sortedTasks = [...tasksWithDates].sort((a, b) => {
+                const aStart = new Date(a.dueDate);
+                aStart.setDate(aStart.getDate() - (a.duration || 1) + 1);
+                const bStart = new Date(b.dueDate);
+                bStart.setDate(bStart.getDate() - (b.duration || 1) + 1);
+                return aStart - bStart;
+            });
+
+            // Calculate date range
+            let allDates = [];
+            sortedTasks.forEach(t => {
+                const endDate = new Date(t.dueDate);
+                const startDate = new Date(t.dueDate);
+                startDate.setDate(startDate.getDate() - (t.duration || 1) + 1);
+                allDates.push(startDate, endDate);
+            });
+
+            const minDate = new Date(Math.min(...allDates));
+            const maxDate = new Date(Math.max(...allDates));
+
+            // Add padding
+            minDate.setDate(minDate.getDate() - 2);
+            maxDate.setDate(maxDate.getDate() + 2);
+
+            const daysDiff = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24));
+            const dateHeaders = [];
+
+            for (let i = 0; i <= daysDiff; i++) {
+                const date = new Date(minDate);
+                date.setDate(date.getDate() + i);
+                dateHeaders.push(date);
+            }
+
+            // Build timeline grid
+            let html = `
+                <div class="timeline-grid">
+                    <div class="timeline-header">
+                        <div class="timeline-label">Task</div>
+                        <div class="timeline-dates">
+                            ${dateHeaders.map(date => `
+                                <div class="timeline-date-cell">
+                                    ${date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+            `;
+
+            sortedTasks.forEach(task => {
+                const blocked = isTaskBlocked(task);
+                const completedClass = task.status === 'Completed' ? 'status-completed' : '';
+
+                const taskEndDate = new Date(task.dueDate);
+                const taskStartDate = new Date(task.dueDate);
+                const duration = task.duration || 1;
+                taskStartDate.setDate(taskStartDate.getDate() - duration + 1);
+
+                // Calculate position and width - account for total number of date cells
+                const totalDateCells = daysDiff + 1; // dateHeaders has daysDiff + 1 cells (0 to daysDiff inclusive)
+                const daysFromStart = Math.ceil((taskStartDate - minDate) / (1000 * 60 * 60 * 24));
+                const leftPercent = (daysFromStart / totalDateCells) * 100;
+                const widthPercent = (duration / totalDateCells) * 100;
+
+                const subcategoryColor = getSubcategoryColor(task.category);
+                const personColor = getPersonColor(task.assignedTo);
+                const personClass = `person-${task.assignedTo.toLowerCase()}`;
+
+                html += `
+                    <div class="timeline-row">
+                        <div class="timeline-task-name" onclick="openTaskForm('${task.id}')">${task.name}</div>
+                        <div class="timeline-task-bar-container" data-task-id="${task.id}">
+                            <div class="timeline-bars">
+                                <div class="timeline-bar ${completedClass} ${blocked ? 'blocked' : ''}"
+                                     style="left: ${leftPercent}%; width: ${widthPercent}%; background-color: ${subcategoryColor}; border-color: ${subcategoryColor};"
+                                     onclick="openTaskForm('${task.id}')"
+                                     title="${task.name}">
+                                    ${task.name}
+                                    <div class="timeline-person-indicator ${personClass}"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = unallocatedHTML + html;
+
+            // Draw dependency lines
+            setTimeout(() => drawDependencyLines(), 100);
+        }
+
+        function drawDependencyLines() {
+            const svg = document.getElementById('dependency-svg');
+            svg.innerHTML = '';
+
+            const timelineContainer = document.querySelector('.timeline-container');
+            if (!timelineContainer) return;
+
+            const containerRect = timelineContainer.getBoundingClientRect();
+
+            tasks.forEach(task => {
+                if (!task.dependencies || task.dependencies.length === 0) return;
+
+                const taskBar = document.querySelector(`[data-task-id="${task.id}"] .timeline-bar`);
+                if (!taskBar) return;
+
+                task.dependencies.forEach(depId => {
+                    const depTask = tasks.find(t => t.id === depId);
+                    if (!depTask) return;
+
+                    const depBar = document.querySelector(`[data-task-id="${depId}"] .timeline-bar`);
+                    if (!depBar) return;
+
+                    const taskRect = taskBar.getBoundingClientRect();
+                    const depRect = depBar.getBoundingClientRect();
+
+                    // Calculate relative positions
+                    const x1 = depRect.right - containerRect.left + timelineContainer.scrollLeft;
+                    const y1 = depRect.top - containerRect.top + depRect.height / 2 + timelineContainer.scrollTop;
+                    const x2 = taskRect.left - containerRect.left + timelineContainer.scrollLeft;
+                    const y2 = taskRect.top - containerRect.top + taskRect.height / 2 + timelineContainer.scrollTop;
+
+                    // Create curved path
+                    const midX = (x1 + x2) / 2;
+                    const path = `M ${x1} ${y1} Q ${midX} ${y1}, ${midX} ${(y1 + y2) / 2} T ${x2} ${y2}`;
+
+                    const isBlocked = depTask.status !== 'Completed';
+                    const lineClass = isBlocked ? 'blocked' : 'resolved';
+
+                    svg.innerHTML += `
+                        <g class="dependency-line ${lineClass}">
+                            <path d="${path}" />
+                        </g>
+                    `;
+                });
+            });
+        }
+    </script>
+</body>
+</html>

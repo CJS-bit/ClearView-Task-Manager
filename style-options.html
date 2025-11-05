@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClearView Task Manager - Style Options</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 28px;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .option {
+            border: 2px solid #444;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .option-header {
+            background: #2a2a2a;
+            padding: 15px 20px;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .option-content {
+            padding: 30px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: flex-start;
+        }
+
+        .sample-section {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .sample-section h3 {
+            font-size: 14px;
+            margin-bottom: 12px;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Option 1: Clean Minimal */
+        .option1 {
+            background: #ffffff;
+            color: #1a1a1a;
+        }
+
+        .option1 input, .option1 select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            background: white;
+            color: #1a1a1a;
+        }
+
+        .option1 input:focus, .option1 select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .option1 button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .option1 .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .option1 .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .option1 .btn-secondary {
+            background: #e5e7eb;
+            color: #1a1a1a;
+        }
+
+        .option1 .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        .option1 .status-card {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border-left: 3px solid;
+        }
+
+        .option1 .status-green {
+            background: #f0fdf4;
+            border-left-color: #22c55e;
+            color: #166534;
+        }
+
+        .option1 .status-orange {
+            background: #fff7ed;
+            border-left-color: #f97316;
+            color: #9a3412;
+        }
+
+        .option1 .status-red {
+            background: #fef2f2;
+            border-left-color: #ef4444;
+            color: #991b1b;
+        }
+
+        /* Option 2: Soft Gradient */
+        .option2 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+        }
+
+        .option2 input, .option2 select {
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .option2 input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .option2 input:focus, .option2 select:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+        }
+
+        .option2 button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .option2 .btn-primary {
+            background: rgba(255, 255, 255, 0.95);
+            color: #667eea;
+        }
+
+        .option2 .btn-primary:hover {
+            background: white;
+            transform: translateY(-1px);
+        }
+
+        .option2 .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .option2 .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .option2 .status-card {
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .option2 .status-green {
+            background: rgba(34, 197, 94, 0.25);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+        }
+
+        .option2 .status-orange {
+            background: rgba(249, 115, 22, 0.25);
+            border: 1px solid rgba(249, 115, 22, 0.4);
+        }
+
+        .option2 .status-red {
+            background: rgba(239, 68, 68, 0.25);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
+        /* Option 3: Dark Professional */
+        .option3 {
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+
+        .option3 input, .option3 select {
+            width: 100%;
+            padding: 11px 15px;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .option3 input:focus, .option3 select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: #1e293b;
+        }
+
+        .option3 button {
+            padding: 11px 22px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .option3 .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .option3 .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .option3 .btn-secondary {
+            background: #334155;
+            color: #e2e8f0;
+        }
+
+        .option3 .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .option3 .status-card {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            background: #0f172a;
+            border-left: 3px solid;
+        }
+
+        .option3 .status-green {
+            border-left-color: #22c55e;
+        }
+
+        .option3 .status-orange {
+            border-left-color: #f97316;
+        }
+
+        .option3 .status-red {
+            border-left-color: #ef4444;
+        }
+
+        /* Option 4: Warm Neutral */
+        .option4 {
+            background: #faf8f6;
+            color: #292524;
+        }
+
+        .option4 input, .option4 select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e7e5e4;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            background: white;
+            color: #292524;
+        }
+
+        .option4 input:focus, .option4 select:focus {
+            outline: none;
+            border-color: #78716c;
+        }
+
+        .option4 button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .option4 .btn-primary {
+            background: #292524;
+            color: #faf8f6;
+        }
+
+        .option4 .btn-primary:hover {
+            background: #1c1917;
+        }
+
+        .option4 .btn-secondary {
+            background: #e7e5e4;
+            color: #292524;
+        }
+
+        .option4 .btn-secondary:hover {
+            background: #d6d3d1;
+        }
+
+        .option4 .status-card {
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 2px solid;
+        }
+
+        .option4 .status-green {
+            background: #f0fdf4;
+            border-color: #86efac;
+            color: #166534;
+        }
+
+        .option4 .status-orange {
+            background: #fff7ed;
+            border-color: #fdba74;
+            color: #9a3412;
+        }
+
+        .option4 .status-red {
+            background: #fef2f2;
+            border-color: #fca5a5;
+            color: #991b1b;
+        }
+
+        /* Option 5: Cool Modern */
+        .option5 {
+            background: #f0f9ff;
+            color: #0c4a6e;
+        }
+
+        .option5 input, .option5 select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #bae6fd;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            background: white;
+            color: #0c4a6e;
+        }
+
+        .option5 input:focus, .option5 select:focus {
+            outline: none;
+            border-color: #0284c7;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+        }
+
+        .option5 button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .option5 .btn-primary {
+            background: #0284c7;
+            color: white;
+        }
+
+        .option5 .btn-primary:hover {
+            background: #0369a1;
+        }
+
+        .option5 .btn-secondary {
+            background: #e0f2fe;
+            color: #0c4a6e;
+        }
+
+        .option5 .btn-secondary:hover {
+            background: #bae6fd;
+        }
+
+        .option5 .status-card {
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        .option5 .status-green {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .option5 .status-orange {
+            background: #fed7aa;
+            color: #92400e;
+        }
+
+        .option5 .status-red {
+            background: #fecaca;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <h1>ClearView Task Manager - Choose Your Style</h1>
+
+    <div class="options-container">
+
+        <!-- Option 1: Clean Minimal -->
+        <div class="option option1">
+            <div class="option-header">Option 1: Clean Minimal (Light)</div>
+            <div class="option-content">
+                <div class="sample-section">
+                    <h3>Form Controls</h3>
+                    <input type="text" placeholder="Task name...">
+                    <br><br>
+                    <select>
+                        <option>Select category...</option>
+                        <option>Research</option>
+                        <option>Development</option>
+                    </select>
+                </div>
+
+                <div class="sample-section">
+                    <h3>Buttons</h3>
+                    <button class="btn-primary">Add Task</button>
+                    <button class="btn-secondary">Cancel</button>
+                </div>
+
+                <div class="sample-section">
+                    <h3>Task Status Examples</h3>
+                    <div class="status-card status-green">
+                        <strong>Task on track</strong> - Due in 5 days
+                    </div>
+                    <div class="status-card status-orange">
+                        <strong>Due soon</strong> - Due in 1 day
+                    </div>
+                    <div class="status-card status-red">
+                        <strong>Overdue</strong> - Was due yesterday
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Option 2: Soft Gradient -->
+        <div class="option option2">
+            <div class="option-header">Option 2: Soft Gradient (Purple/Blue)</div>
+            <div class="option-content">
+                <div class="sample-section">
+                    <h3>Form Controls</h3>
+                    <input type="text" placeholder="Task name...">
+                    <br><br>
+                    <select>
+                        <option>Select category...</option>
+                        <option>Research</option>
+                        <option>Development</option>
+                    </select>
+                </div>
+
+                <div class="sample-section">
+                    <h3>Buttons</h3>
+                    <button class="btn-primary">Add Task</button>
+                    <button class="btn-secondary">Cancel</button>
+                </div>
+
+                <div class="sample-section">
+                    <h3>Task Status Examples</h3>
+                    <div class="status-card status-green">
+                        <strong>Task on track</strong> - Due in 5 days
+                    </div>
+                    <div class="status-card status-orange">
+                        <strong>Due soon</strong> - Due in 1 day
+                    </div>
+                    <div class="status-card status-red">
+                        <strong>Overdue</strong> - Was due yesterday
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Option 3: Dark Professional -->
+        <div class="option option3">
+            <div class="option-header">Option 3: Dark Professional</div>
+            <div class="option-content">
+                <div class="sample-section">
+                    <h3>Form Controls</h3>
+                    <input type="text" placeholder="Task name...">
+                    <br><br>
+                    <select>
+                        <option>Select category...</option>
+                        <option>Research</option>
+                        <option>Development</option>
+                    </select>
+                </div>
+
+                <div class="sample-section">
+                    <h3>Buttons</h3>
+                    <button class="btn-primary">Add Task</button>
+                    <button class="btn-secondary">Cancel</button>
+                </div>
+
+                <div class="sample-section">
+                    <h3>Task Status Examples</h3>
+                    <div class="status-card status-green">
+                        <strong>Task on track</strong> - Due in 5 days
+                    </div>
+                    <div class="status-card status-orange">
+                        <strong>Due soon</strong> - Due in 1 day
+                    </div>
+                    <div class="status-card status-red">
+                        <strong>Overdue</strong> - Was due yesterday
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Option 4: Warm Neutral -->
+        <div class="option option4">
+            <div class="option-header">Option 4: Warm Neutral (Beige/Stone)</div>
+            <div class="option-content">
+                <div class="sample-section">
+                    <h3>Form Controls</h3>
+                    <input type="text" placeholder="Task name...">
+                    <br><br>
+                    <select>
+                        <option>Select category...</option>
+                        <option>Research</option>
+                        <option>Development</option>
+                    </select>
+                </div>
+
+                <div class="sample-section">
+                    <h3>Buttons</h3>
+                    <button class="btn-primary">Add Task</button>
+                    <button class="btn-secondary">Cancel</button>
+                </div>
+
+                <div class="sample-section">
+                    <h3>Task Status Examples</h3>
+                    <div class="status-card status-green">
+                        <strong>Task on track</strong> - Due in 5 days
+                    </div>
+                    <div class="status-card status-orange">
+                        <strong>Due soon</strong> - Due in 1 day
+                    </div>
+                    <div class="status-card status-red">
+                        <strong>Overdue</strong> - Was due yesterday
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Option 5: Cool Modern -->
+        <div class="option option5">
+            <div class="option-header">Option 5: Cool Modern (Sky Blue)</div>
+            <div class="option-content">
+                <div class="sample-section">
+                    <h3>Form Controls</h3>
+                    <input type="text" placeholder="Task name...">
+                    <br><br>
+                    <select>
+                        <option>Select category...</option>
+                        <option>Research</option>
+                        <option>Development</option>
+                    </select>
+                </div>
+
+                <div class="sample-section">
+                    <h3>Buttons</h3>
+                    <button class="btn-primary">Add Task</button>
+                    <button class="btn-secondary">Cancel</button>
+                </div>
+
+                <div class="sample-section">
+                    <h3>Task Status Examples</h3>
+                    <div class="status-card status-green">
+                        <strong>Task on track</strong> - Due in 5 days
+                    </div>
+                    <div class="status-card status-orange">
+                        <strong>Due soon</strong> - Due in 1 day
+                    </div>
+                    <div class="status-card status-red">
+                        <strong>Overdue</strong> - Was due yesterday
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
