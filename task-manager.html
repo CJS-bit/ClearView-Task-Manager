@@ -10,11 +10,31 @@
             --color-red: #C25B70;
             --color-green: #5DFDA8;
             --color-orange: #E6B589;
-            --color-purple: #9E9EDE;
-            --color-teal: #1AD1DB;
             --color-grey: #E8E8E8;
             --color-dark-grey: #4A4A4A;
             --color-text: #333333;
+
+            /* Main category colors */
+            --color-pitch: #6FB3D4;
+            --color-app: #9E6DD4;
+
+            /* Person colors */
+            --color-terry: #5B2C91;
+            --color-caroline: #0F7D8A;
+            --color-both: #E6B589;
+            --color-unassigned: #A0A0A0;
+
+            /* PITCH subcategory colors (blue shades) */
+            --color-pitch-app: #A8D5E2;
+            --color-pitch-tide: #6FB3D4;
+
+            /* APP subcategory colors (purple shades) */
+            --color-app-design-ui: #E6D5F5;
+            --color-app-design-coding: #D1B3EC;
+            --color-app-coding: #B88FE0;
+            --color-app-copywriting: #9E6DD4;
+            --color-app-bugs: #8550C7;
+            --color-app-security: #6B36BA;
         }
 
         * {
@@ -217,29 +237,32 @@
         .upcoming-task-bar {
             display: flex;
             align-items: center;
-            padding: 8px 12px;
+            gap: 8px;
+            padding: 0;
             border-radius: 8px;
             font-size: 11px;
             font-weight: 600;
-            color: black;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
         }
 
-        .upcoming-task-bar.assigned-terry {
-            background: var(--color-purple);
+        .upcoming-task-category-section {
+            padding: 8px 10px;
+            font-size: 10px;
         }
 
-        .upcoming-task-bar.assigned-caroline {
-            background: var(--color-teal);
+        .upcoming-task-person-section {
+            padding: 8px 10px;
+            font-size: 10px;
+            color: white;
         }
 
-        .upcoming-task-bar.assigned-both {
-            background: var(--color-orange);
-        }
-
-        .upcoming-task-bar.assigned-unassigned {
-            background: var(--color-grey);
-            color: var(--color-text);
+        .upcoming-task-main-section {
+            flex: 1;
+            padding: 8px 12px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
         }
 
         .upcoming-task-date {
@@ -256,7 +279,6 @@
 
         /* Task Card Styles */
         .task-card {
-            padding: 10px 15px;
             border-radius: 10px;
             margin-bottom: 8px;
             border: none;
@@ -264,8 +286,8 @@
             cursor: pointer;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            overflow: hidden;
+            align-items: stretch;
         }
 
         .task-card:hover {
@@ -273,37 +295,42 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
         }
 
-        .task-card.assigned-terry {
-            background: var(--color-purple);
-        }
-
-        .task-card.assigned-caroline {
-            background: var(--color-teal);
-        }
-
-        .task-card.assigned-both {
-            background: var(--color-orange);
-        }
-
-        .task-card.assigned-unassigned {
-            background: var(--color-grey);
-        }
-
         .task-card.status-completed {
             opacity: 0.6;
         }
 
-        .task-card-left {
+        .task-card-category {
+            padding: 10px 15px;
             display: flex;
-            gap: 12px;
             align-items: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-text);
+            min-width: 150px;
+        }
+
+        .task-card-person {
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: white;
+            min-width: 100px;
+        }
+
+        .task-card-main {
             flex: 1;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .task-title {
             font-size: 15px;
             font-weight: 600;
-            color: black;
+            color: var(--color-text);
         }
 
         .task-meta {
@@ -311,15 +338,6 @@
             gap: 12px;
             font-size: 13px;
             align-items: center;
-        }
-
-        .task-badge {
-            padding: 4px 10px;
-            border-radius: 6px;
-            background: rgba(255, 255, 255, 0.25);
-            font-size: 12px;
-            white-space: nowrap;
-            color: black;
         }
 
         .due-date-badge {
@@ -687,24 +705,9 @@
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
         }
 
-        .timeline-bar.assigned-terry {
-            background: var(--color-purple);
-            border-color: #7d7dc8;
-        }
-
-        .timeline-bar.assigned-caroline {
-            background: var(--color-teal);
-            border-color: #14a8b0;
-        }
-
-        .timeline-bar.assigned-both {
-            background: var(--color-orange);
-            border-color: #c4945c;
-        }
-
-        .timeline-bar.assigned-unassigned {
-            background: var(--color-grey);
-            border-color: var(--color-dark-grey);
+        /* Timeline bars will be colored by subcategory via inline styles */
+        .timeline-bar {
+            /* Background color set via inline style based on subcategory */
         }
 
         .timeline-bar.status-completed {
@@ -715,7 +718,7 @@
             border: 3px solid var(--color-red);
         }
 
-        .timeline-due-indicator {
+        .timeline-person-indicator {
             position: absolute;
             right: -8px;
             top: 50%;
@@ -726,20 +729,20 @@
             border: 2px solid white;
         }
 
-        .timeline-due-indicator.on-track {
-            background: var(--color-green);
+        .timeline-person-indicator.person-terry {
+            background: var(--color-terry);
         }
 
-        .timeline-due-indicator.due-soon {
-            background: var(--color-orange);
+        .timeline-person-indicator.person-caroline {
+            background: var(--color-caroline);
         }
 
-        .timeline-due-indicator.overdue {
-            background: var(--color-red);
+        .timeline-person-indicator.person-both {
+            background: var(--color-both);
         }
 
-        .timeline-due-indicator.unallocated {
-            background: var(--color-dark-grey);
+        .timeline-person-indicator.person-unassigned {
+            background: var(--color-unassigned);
         }
 
         /* Dependency Lines */
@@ -773,6 +776,60 @@
         .empty-state h3 {
             font-size: 24px;
             margin-bottom: 10px;
+        }
+
+        /* Unallocated Tasks Section */
+        .unallocated-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid var(--color-grey);
+            margin-bottom: 20px;
+        }
+
+        .unallocated-section h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: var(--color-text);
+            font-weight: 700;
+        }
+
+        .unallocated-task-item {
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .unallocated-task-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
+        }
+
+        .unallocated-task-category {
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .unallocated-task-person {
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .unallocated-task-name {
+            flex: 1;
+            font-weight: 600;
         }
 
         /* Manage Categories Modal */
@@ -1106,6 +1163,40 @@
         // Category Helper Functions
         function getCategoryById(id) {
             return categories.find(c => c.id === id);
+        }
+
+        function getSubcategoryColor(categoryId) {
+            const colorMap = {
+                'pitch-app': '#A8D5E2',
+                'pitch-tide': '#6FB3D4',
+                'app-design-ui': '#E6D5F5',
+                'app-design-coding': '#D1B3EC',
+                'app-coding': '#B88FE0',
+                'app-copywriting': '#9E6DD4',
+                'app-bugs': '#8550C7',
+                'app-security': '#6B36BA'
+            };
+            return colorMap[categoryId] || '#CCCCCC';
+        }
+
+        function getMainCategoryColor(categoryId) {
+            const category = getCategoryById(categoryId);
+            if (!category) return '#CCCCCC';
+
+            const parent = category.parentId ? getCategoryById(category.parentId) : category;
+            if (parent && parent.id === 'pitch') return '#6FB3D4';
+            if (parent && parent.id === 'app') return '#9E6DD4';
+            return '#CCCCCC';
+        }
+
+        function getPersonColor(assignedTo) {
+            const colorMap = {
+                'Terry': '#5B2C91',
+                'Caroline': '#0F7D8A',
+                'Both': '#E6B589',
+                'Unassigned': '#A0A0A0'
+            };
+            return colorMap[assignedTo] || '#A0A0A0';
         }
 
         function getCategoryFullPath(categoryId) {
@@ -1526,7 +1617,7 @@
                     labels: ['Total Outstanding', 'Unassigned', 'Terry', 'Caroline', 'Both'],
                     datasets: [{
                         data: [totalOutstandingDays, unassignedDays, terryDays, carolineDays, bothDays],
-                        backgroundColor: ['#A0A0A0', '#C25B70', '#9E9EDE', '#1AD1DB', '#E6B589'],
+                        backgroundColor: ['#A0A0A0', '#A0A0A0', '#5B2C91', '#0F7D8A', '#E6B589'],
                         borderRadius: 6,
                         borderSkipped: false
                     }]
@@ -1578,16 +1669,27 @@
                 upcomingBarsContainer.innerHTML = '<div style="text-align: center; opacity: 0.6; padding: 20px;">No upcoming tasks</div>';
             } else {
                 upcomingBarsContainer.innerHTML = next4Tasks.map(task => {
-                    const assignedClass = `assigned-${task.assignedTo.toLowerCase()}`;
                     const dueDate = new Date(task.dueDate).toLocaleDateString('en-GB', {
                         day: 'numeric',
                         month: 'short'
                     });
+                    const subcategoryColor = getSubcategoryColor(task.category);
+                    const personColor = getPersonColor(task.assignedTo);
+                    const mainCategoryColor = getMainCategoryColor(task.category);
+                    const categoryPath = getCategoryFullPath(task.category);
 
                     return `
-                        <div class="upcoming-task-bar ${assignedClass}">
-                            <span class="upcoming-task-date">${dueDate}</span>
-                            <span class="upcoming-task-name">${task.name}</span>
+                        <div class="upcoming-task-bar" onclick="openTaskForm('${task.id}')" style="cursor: pointer;">
+                            <div class="upcoming-task-category-section" style="background-color: ${subcategoryColor};">
+                                ${categoryPath.split(' > ')[1] || categoryPath}
+                            </div>
+                            <div class="upcoming-task-person-section" style="background-color: ${personColor};">
+                                ${task.assignedTo}
+                            </div>
+                            <div class="upcoming-task-main-section" style="background-color: ${mainCategoryColor};">
+                                <span class="upcoming-task-date">${dueDate}</span>
+                                <span class="upcoming-task-name">${task.name}</span>
+                            </div>
                         </div>
                     `;
                 }).join('');
@@ -1711,7 +1813,6 @@
 
         function renderTaskCard(task) {
             const status = getTaskStatus(task);
-            const assignedClass = `assigned-${task.assignedTo.toLowerCase()}`;
             const completedClass = task.status === 'Completed' ? 'status-completed' : '';
 
             const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-GB', {
@@ -1720,21 +1821,31 @@
             }) : 'Unallocated';
 
             const categoryPath = getCategoryFullPath(task.category);
+            const mainCategoryColor = getMainCategoryColor(task.category);
+            const subcategoryColor = getSubcategoryColor(task.category);
+            const personColor = getPersonColor(task.assignedTo);
 
             return `
-                <div class="task-card ${assignedClass} ${completedClass}" onclick="openTaskForm('${task.id}')">
-                    <div class="task-card-left">
-                        <span class="task-badge">${categoryPath}</span>
-                        <div class="task-title">${task.name}</div>
-                        <span class="due-date-badge ${status}">${dueDate}</span>
+                <div class="task-card ${completedClass}" onclick="openTaskForm('${task.id}')">
+                    <div class="task-card-category" style="background-color: ${subcategoryColor};">
+                        ${categoryPath}
                     </div>
-                    <div class="task-actions">
-                        <button class="btn btn-secondary btn-small" onclick="event.stopPropagation(); toggleTaskComplete('${task.id}')">
-                            ${task.status === 'Completed' ? 'Undo' : 'Complete'}
-                        </button>
-                        <button class="btn btn-secondary btn-small" onclick="event.stopPropagation(); deleteTask('${task.id}')">
-                            Delete
-                        </button>
+                    <div class="task-card-person" style="background-color: ${personColor};">
+                        ${task.assignedTo}
+                    </div>
+                    <div class="task-card-main" style="background-color: ${mainCategoryColor};">
+                        <div class="task-title">${task.name}</div>
+                        <div class="task-meta">
+                            <span class="due-date-badge ${status}">${dueDate}</span>
+                            <div class="task-actions" onclick="event.stopPropagation();">
+                                <button class="btn btn-secondary btn-small" onclick="toggleTaskComplete('${task.id}')">
+                                    ${task.status === 'Completed' ? 'Undo' : 'Complete'}
+                                </button>
+                                <button class="btn btn-secondary btn-small" onclick="deleteTask('${task.id}')">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
@@ -1743,11 +1854,38 @@
         function renderTimelineView() {
             const container = document.getElementById('timeline-content');
 
+            // Get tasks without due dates (unallocated)
+            const unallocatedTasks = tasks.filter(t => !t.dueDate);
+
+            // Build unallocated section
+            let unallocatedHTML = '';
+            if (unallocatedTasks.length > 0) {
+                unallocatedHTML = '<div class="unallocated-section"><h3>Unallocated Tasks (No Due Date)</h3>';
+                unallocatedTasks.forEach(task => {
+                    const subcategoryColor = getSubcategoryColor(task.category);
+                    const personColor = getPersonColor(task.assignedTo);
+                    const categoryPath = getCategoryFullPath(task.category);
+
+                    unallocatedHTML += `
+                        <div class="unallocated-task-item" onclick="openTaskForm('${task.id}')">
+                            <div class="unallocated-task-category" style="background-color: ${subcategoryColor};">
+                                ${categoryPath}
+                            </div>
+                            <div class="unallocated-task-person" style="background-color: ${personColor};">
+                                ${task.assignedTo}
+                            </div>
+                            <div class="unallocated-task-name">${task.name}</div>
+                        </div>
+                    `;
+                });
+                unallocatedHTML += '</div>';
+            }
+
             // Only show tasks with due dates in timeline
             const tasksWithDates = tasks.filter(t => t.dueDate);
 
             if (tasksWithDates.length === 0) {
-                container.innerHTML = '<div class="empty-state"><h3>No tasks with due dates!</h3><p>Add due dates to tasks to see them in the timeline view.</p></div>';
+                container.innerHTML = unallocatedHTML + '<div class="empty-state"><h3>No tasks with due dates!</h3><p>Add due dates to tasks to see them in the timeline view.</p></div>';
                 return;
             }
 
@@ -1801,9 +1939,7 @@
             `;
 
             sortedTasks.forEach(task => {
-                const status = getTaskStatus(task);
                 const blocked = isTaskBlocked(task);
-                const assignedClass = `assigned-${task.assignedTo.toLowerCase()}`;
                 const completedClass = task.status === 'Completed' ? 'status-completed' : '';
 
                 const taskEndDate = new Date(task.dueDate);
@@ -1817,17 +1953,21 @@
                 const leftPercent = (daysFromStart / totalDateCells) * 100;
                 const widthPercent = (duration / totalDateCells) * 100;
 
+                const subcategoryColor = getSubcategoryColor(task.category);
+                const personColor = getPersonColor(task.assignedTo);
+                const personClass = `person-${task.assignedTo.toLowerCase()}`;
+
                 html += `
                     <div class="timeline-row">
                         <div class="timeline-task-name" onclick="openTaskForm('${task.id}')">${task.name}</div>
                         <div class="timeline-task-bar-container" data-task-id="${task.id}">
                             <div class="timeline-bars">
-                                <div class="timeline-bar ${assignedClass} ${completedClass} ${blocked ? 'blocked' : ''}"
-                                     style="left: ${leftPercent}%; width: ${widthPercent}%;"
+                                <div class="timeline-bar ${completedClass} ${blocked ? 'blocked' : ''}"
+                                     style="left: ${leftPercent}%; width: ${widthPercent}%; background-color: ${subcategoryColor}; border-color: ${subcategoryColor};"
                                      onclick="openTaskForm('${task.id}')"
                                      title="${task.name}">
                                     ${task.name}
-                                    <div class="timeline-due-indicator ${status}"></div>
+                                    <div class="timeline-person-indicator ${personClass}"></div>
                                 </div>
                             </div>
                         </div>
@@ -1836,7 +1976,7 @@
             });
 
             html += '</div>';
-            container.innerHTML = html;
+            container.innerHTML = unallocatedHTML + html;
 
             // Draw dependency lines
             setTimeout(() => drawDependencyLines(), 100);
